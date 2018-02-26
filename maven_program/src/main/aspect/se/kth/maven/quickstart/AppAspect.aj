@@ -17,19 +17,24 @@ public aspect AppAspect {
 			field access join points.
   
 	 * */
-	/*before(): tracecall()
+	before(): tracecall()
 	{
 		// thisJoinPoint object, which contains the text representation of the captured join point.
 		//getSourceLocation() gives the source location in the form of line number
 		//System.out.println("           before: " + thisJoinPoint);
-		 System.out.println();
+		 //System.out.println();
 		 System.out.println("before "+ thisJoinPoint+" Location:  " + thisJoinPoint.getSourceLocation());
-	}*/
+	}
 	//before(Thread childThread) : call(public void  java.lang.Thread.start() && within(Java.lang.*)
 	//pointcut threadweave():  call(public void  java.lang.Thread.start())  && !within(AppAspect) ;
-	before(Thread childThread) : call(* java.lang.Thread.start(..))  && !within(AppAspect) && target(childThread)
+	//before(Thread childThread) : call(* java.lang.Thread.start(..)) && !within(AppAspect) && target(childThread)
+	before(Thread childThread) : call(public void java.lang.Thread.start()) && !within(AppAspect) && target(childThread)
 	{
-		System.out.println("hi monali i am inside:");
+		
+		System.out.println();
+		System.out.println();
+		System.out.println("Thread information:");
+		System.out.println();
 		System.out.println(Thread.getAllStackTraces());
 		System.out.println("Main thread : Id: " + Thread.currentThread().getId() + " Thread name: "+Thread.currentThread().getName()+" Location:" + thisJoinPoint.getSourceLocation());;
 		System.out.println("Child thread: Id: " + childThread.getId() + " Thread name: "+ childThread.getName()+" Location:" + thisJoinPoint.getSourceLocation());

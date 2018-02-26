@@ -47,6 +47,7 @@
 					<outxml>true</outxml>
 					<verbose>true</verbose>
 					<showWeaveInfo>true</showWeaveInfo>
+		
 					<aspectLibraries>
 				      <aspectLibrary>
 				        <groupId>com.jcabi</groupId>
