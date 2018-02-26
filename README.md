@@ -8,5 +8,6 @@ point-cut and played with point-cut declaration to understand the method call wi
 
 # Script Information:
 runAspectJ.sh : Script to run the AspectJ file
+
 runAspectJweaving.sh : Script to run the AspectJ after weaving Thread class.
 
