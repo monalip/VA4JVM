@@ -1,5 +1,4 @@
 # VA4JVM
-# my name is monalip
 In this project, we focus on the integration of execution traces from the regular JVM into a “jpf-visual” tool 
 and visualize different run-time events.
 
@@ -8,5 +7,6 @@ point-cut and played with point-cut declaration to understand the method call wi
 
 # Script Information:
 runAspectJ.sh : Script to run the AspectJ file
+
 runAspectJweaving.sh : Script to run the AspectJ after weaving Thread class.
 
