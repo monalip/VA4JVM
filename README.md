@@ -12,16 +12,20 @@ runAspectJweaving.sh : Script to run the AspectJ after weaving Thread class.
 
 # Building tool using Maven:
 For the building project using maven :
+
 First we have to install the mavent into to the System.
+
 # Installing Maven on Ubuntu:
 sudo apt-get install maven
 # Installing Maven on Mac OS X :
 Follow the instruction given in link :
+
 http://www.baeldung.com/install-maven-on-windows-linux-mac
-Compile using Maven:
+
+#Compile using Maven:
 mvn compile
-Building the project:
+#Building the project:
 mvn clean package
-Run the project:
+#Run the project:
 mvn exec:java
 
