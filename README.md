@@ -22,10 +22,10 @@ Follow the instruction given in link :
 
 http://www.baeldung.com/install-maven-on-windows-linux-mac
 
-#Compile using Maven:
-mvn compile
-#Building the project:
-mvn clean package
-#Run the project:
-mvn exec:java
+## Compile using Maven:<br /> 
+mvn compile <br /> 
+## Building the project:
+mvn clean package <br /> 
+## Run the project:
+mvn exec:java <br /> 
 
