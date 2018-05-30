@@ -9,6 +9,7 @@ import org.aspectj.lang.Signature;
 
 public aspect AppAspect {
 	int transition =0;
+	
 
 	
 	pointcut traceCall() : !within(AppAspect);
@@ -25,7 +26,7 @@ public aspect AppAspect {
   
 	 * */
 	
-	
+	 
 	//before(Thread childThread) : call(public void  java.lang.Thread.start() && within(Java.lang.*)
 	//pointcut threadweave():  call(public void  java.lang.Thread.start())  && !within(AppAspect) ;
 	//before(Thread childThread) : call(* java.lang.Thread.start(..)) && !within(AppAspect) && target(childThread)
@@ -107,6 +108,20 @@ public aspect AppAspect {
 		System.out.println();
 		
 	}*/
+	
+	/*
+	 * 
+	 * Instrument the end of main method before start the visualization 
+	 * 
+	 * 
+	 */
+	pointcut mainMethod() : execution(public static void main(String[]));
+	 
+	 
+	   after() : mainMethod()
+	   {
+		   System.out.println("The application has ended...");
+	   }
 	
 
 
