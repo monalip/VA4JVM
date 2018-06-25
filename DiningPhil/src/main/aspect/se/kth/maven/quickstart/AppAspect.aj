@@ -1,9 +1,21 @@
 package se.kth.maven.quickstart;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.logging.*;
 
 import org.aspectj.lang.Signature;
+
+import se.kth.tracedata.jvm.Path;
+import se.kth.jpf_visual.TraceData;
+import se.kth.tracedata.Transition;
+
+
 
 
 
@@ -11,6 +23,8 @@ public aspect AppAspect {
 	int transition =0;
 	
 
+	Logger log = Logger.getLogger(AppAspect.class.getName());
+	
 	
 	pointcut traceCall() : !within(AppAspect);
 	/*
@@ -56,7 +70,9 @@ public aspect AppAspect {
 		//getSourceLocation() gives the source location in the form of line number
 		//System.out.println("           before: " + thisJoinPoint);
 		
-		Logger.getLogger("Tracing ").log(Level.INFO,thisJoinPoint+" Location:  " + thisJoinPoint.getSourceLocation());
+		
+		// AppAspect.class.getName() gives the full name of the class along with package name
+		log.log(Level.INFO,thisJoinPoint+" Location:  " + thisJoinPoint.getSourceLocation());
 		 transition ++;
 		
 	}
@@ -76,7 +92,7 @@ public aspect AppAspect {
 		Signature sign = thisJoinPointStaticPart.getSignature();
 		int lineNumb = thisJoinPointStaticPart.getSourceLocation().getLine(); 
 		String sourceName = thisJoinPointStaticPart.getSourceLocation().getWithinType().getCanonicalName();
-		Logger.getLogger("Tracing ").log(Level.INFO,"Call from " + sourceName + " line number "+lineNumb + " "+ sign.getDeclaringTypeName()+"."+sign.getName());
+		log.log(Level.INFO,"Call from " + sourceName + " line number "+lineNumb + " "+ sign.getDeclaringTypeName()+"."+sign.getName());
 	}
 	
 	/*
@@ -90,7 +106,7 @@ public aspect AppAspect {
 		Signature sign = thisJoinPointStaticPart.getSignature();
 		int lineNumb = thisJoinPointStaticPart.getSourceLocation().getLine(); 
 		String sourceName = thisJoinPointStaticPart.getSourceLocation().getWithinType().getCanonicalName();
-		Logger.getLogger("Tracing ").log(Level.INFO,"Call from " + sourceName + " line number "+lineNumb + " "+ sign.getDeclaringTypeName()+"."+sign.getName());
+		log.log(Level.INFO,"Call from " + sourceName + " line number "+lineNumb + " "+ sign.getDeclaringTypeName()+"."+sign.getName());
 	}
 	
 	
@@ -121,8 +137,32 @@ public aspect AppAspect {
 	   after() : mainMethod()
 	   {
 		   System.out.println("The application has ended...");
+		   DisplayErrorTrace();
 	   }
 	
 
+
+	   private void DisplayErrorTrace() {
+	/**
+	
+	 * ProcessBuilder take the executable jar of the DiningPhil program which 
+	 * generate the error trace and show the output there
+	 * 
+	 
+	*/
+
+	se.kth.jpf_visual.ErrorTracePanel gui = new se.kth.jpf_visual.ErrorTracePanel();
+	
+	String app ="Fix it!";
+	LinkedList<Transition> stack=null;
+
+	Path p =null;
+	
+	
+	gui.drowJVMErrTrace(p,true);
+	
+
+	 }
+		
 
 }
