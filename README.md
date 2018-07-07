@@ -22,10 +22,15 @@ Follow the instruction given in link :
 
 http://www.baeldung.com/install-maven-on-windows-linux-mac
 
-##### Compile using Maven:<br /> 
-mvn compile <br /> 
-##### Building the project:
-mvn clean package <br /> 
-##### Run the project:
-mvn exec:java <br /> 
+##### Build and run the hellowworld_VA4JVM using Maven script:<br />
+hellowworld_VA4JVM is the combined project which consist of hellowworld program for the visualization for JVM trace.
+### Building the project :
+The project is build using "build.sh" shell script in the helloworld_VA4JVM folder.</br>
+This build script installs the third party jgraphx library to the "jpf-visual" and "hellowworld" program for graph visualization. Along with that, it builds both the project.</br>
+### Run the visualization project :
+The project is run using "run.sh" shell script.</br>
+### Command to build and run the project :
+##./build.sh && ./run.sh 
+
+ 
 
