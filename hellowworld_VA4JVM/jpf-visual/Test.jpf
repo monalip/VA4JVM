@@ -1,0 +1,24 @@
+# we are using oldclassic as default example
+target=Test
+target.args=5
+
+native_classpath+=./bin/
+
+# not related with trace_storer, we can store with any search algorithm
+#search.class=.search.heuristic.BFSHeuristic
+
+# register console trace printer as a publisher
+#report.publisher+=, errorTracePrinter
+#report.errorTracePrinter.class=ErrorTracePrinter
+# print trace when property is violated
+report.errorTracePrinter.property_violation=trace
+
+#shell=.shell.basicshell.BasicShell
+#shell.panels+= ,errorTrace
+#shell.panels.errorTrace=ErrorTracePanel
+
+#suppress console output
+#report.console.finished=
+#report.console.start=
+#report.console.property_violation=error,trace
+

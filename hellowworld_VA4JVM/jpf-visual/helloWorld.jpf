@@ -1,0 +1,19 @@
+target=se.kth.helloworld.App
+
+classpath=./helloworld/target/classes/
+sourcepath=.
+extensions=${jpf-core}
+
+report.console.property_violation=result,error,trace,snapshot
+vm.reuse_tid=false
+# not related with trace_storer, we can store with any search algorithm
+#search.class=.search.heuristic.BFSHeuristic
+# register console trace printer as a publisher
+report.publisher+=, errorTracePrinter
+report.errorTracePrinter.class= se.kth.jpf_visual.jpf.ErrorTracePrinter
+# print trace when property is violated
+report.errorTracePrinter.property_violation=trace
+shell=.shell.basicshell.BasicShell
+shell.panels+=, errorTrace
+shell.panels.errorTrace= se.kth.jpf_visual.jpf.ErrorTracePanel
+
