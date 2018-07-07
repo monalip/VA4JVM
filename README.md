@@ -26,11 +26,11 @@ http://www.baeldung.com/install-maven-on-windows-linux-mac
 hellowworld_VA4JVM is the combined project which consist of hellowworld program for the visualization for JVM trace.
 ### Building the project :
 The project is build using "build.sh" shell script in the helloworld_VA4JVM folder.</br>
-This build script installs the third party jgraphx library to the "jpf-visual" and "hellowworld" program for graph visualization. Along with that, it builds both the project.</br>
+This build script installs the third party jgraphx library to the "jpf-visual" and "hellowworld" program for graph visualization.This is achieved by including custom library jgraphx into maven local repo. Along with that, it builds both the project.</br>
 ### Run the visualization project :
 The project is run using "run.sh" shell script.</br>
 ### Command to build and run the project :
-##./build.sh && ./run.sh 
+./build.sh && ./run.sh 
 
  
 
