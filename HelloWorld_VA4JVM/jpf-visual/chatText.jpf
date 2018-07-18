@@ -1,0 +1,31 @@
+chatsim=/Users/qiyitang/Documents/PhD/2017GSOC/chatserver-sol/src
+
+# we are using oldclassic as default example
+target=ChatSim
+
+listener=gov.nasa.jpf.listener.PreciseRaceDetector
+cg.threads.break_arrays=true
+
+native_classpath+=./bin/
+
+chatsim.classpath=/Users/qiyitang/Documents/PhD/2017GSOC/chatserver-sol/src/env,/Users/qiyitang/Documents/PhD/2017GSOC/chatserver-sol/src
+chatsim.sourcepath=/Users/qiyitang/Documents/PhD/2017GSOC/chatserver-sol/src
+
+vm.reuse_tid=false
+classpath=/Users/qiyitang/Documents/PhD/2017GSOC/chatserver-sol/src
+
+
+# not related with trace_storer, we can store with any search algorithm
+#search.class=.search.heuristic.BFSHeuristic
+
+# register console trace printer as a publisher
+report.publisher+=, consoleTracePrinter
+report.consoleTracePrinter.class=se.kth.jpf_visual.TraceVisualPrinter
+# print trace when property is violated
+report.consoleTracePrinter.property_violation=trace
+
+shell=.shell.basicshell.BasicShell
+shell.panels+= ,traceServer
+shell.panels.traceServer=se.kth.jpf_visual.TraceVisualPanel
+
+

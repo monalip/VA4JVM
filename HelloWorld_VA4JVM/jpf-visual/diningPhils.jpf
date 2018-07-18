@@ -1,0 +1,14 @@
+# we are using oldclassic as default example
+target=DiningPhil
+target.args=3
+native_classpath+=./bin/
+# not related with trace_storer, we can store with any search algorithm
+#search.class=.search.heuristic.BFSHeuristic
+# register console trace printer as a publisher
+report.publisher+=, errorTracePrinter
+report.errorTracePrinter.class= se.kth.jpf_visual.jpf.ErrorTracePrinter
+# print trace when property is violated
+report.errorTracePrinter.property_violation=trace
+shell=.shell.basicshell.BasicShell
+shell.panels+=, errorTrace
+shell.panels.errorTrace= se.kth.jpf_visual.jpf.ErrorTracePanel
