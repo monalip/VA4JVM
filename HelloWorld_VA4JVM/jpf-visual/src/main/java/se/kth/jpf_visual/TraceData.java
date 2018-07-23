@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
 import se.kth.tracedata.Left;
 import se.kth.tracedata.Pair;
 import se.kth.tracedata.ChoiceGenerator;
@@ -17,6 +18,8 @@ import se.kth.tracedata.Path;
 import se.kth.tracedata.Step;
 import se.kth.tracedata.ThreadInfo;
 import se.kth.tracedata.Transition;
+import se.kth.tracedata.JVMInvokeInstruction;
+
 
 
 //methods of ThreadChoiceFromSet is created inside the ChoiceGenerator along with condition checking method for cg instance of ThreadChoiceFromSet
@@ -28,6 +31,7 @@ public class TraceData {
 	private List<String> threadNames = null;
 
 	private Path path;
+	
 	
 	
 
@@ -72,6 +76,7 @@ public class TraceData {
 		int currTran = 0;
 		int prevThread = -1;
 		int start = -1;
+		
 	
 		for(Transition t: path) {
 			int currThread = t.getThreadIndex();
@@ -98,8 +103,11 @@ public class TraceData {
 	}
 
 	private void secondPass() {
+		
+		
 		// second pass of the path
 		int prevThreadIdx = 0;
+		
 		for (int pi = 0; pi < group.size(); pi++) {
 			Pair<Integer, Integer> p = group.get(pi);
 			int from = p._1;
@@ -115,6 +123,8 @@ public class TraceData {
 			for (int i = from; i <= to; i++) {
 				Transition transition = path.get(i);
 				String lastLine = null;
+				
+				
 
 				int nNoSrc = 0;
 				ChoiceGenerator<?> cg = transition.getChoiceGenerator();
@@ -179,7 +189,7 @@ public class TraceData {
 					ThreadInfo ti = transition.getThreadInfo();
 					
 
-					loadSynchronizedMethod(line, mi);
+					//loadSynchronizedMethod(line, mi);
 
 					loadWaitNotify(line, insn, pi, height);
 
@@ -216,6 +226,7 @@ public class TraceData {
 			}
 
 		}
+
 
 	}
 
@@ -330,8 +341,8 @@ public class TraceData {
 			 * Returning fieldName 
 			 *
 			 */
-			
-			
+			int lastLock = 0;
+			lastLock= insn.getLastLockRef();			
 			String fieldName = ti.getNameOfLastLock(insn.getLastLockRef());
 			Pair<Integer, Integer> pair = new Pair<>(pi, height - 1);
 
@@ -395,17 +406,32 @@ public class TraceData {
 	}
 	
 	private void loadMethods(String line, Instruction insn, TextLine txtSrc) {
+		
 	
 	//checkIJVMInvok is checking whether the ins is the instance of JVMInvokeInstruction internally inside instruction adapter		
-	boolean checkIJVMInvok = insn.isInstanceofJVMInvok();
+	boolean	checkIJVMInvok = insn.isInstanceofJVMInvok();
+
 		
-		if (line != null && txtSrc != null && txtSrc.isSrc() && checkIJVMInvok) {
+		if (line != null && txtSrc != null && txtSrc.isSrc() && (checkIJVMInvok || insn instanceof JVMInvokeInstruction )) {
 			/* instead of calling getInvokedMethodName() of JVMInvokeInstruction i have now changed it
 			* I have created methods getInvokedMethodName() and getInvokedMethodClassName() inside instruction interface 
 			*to remove the previous error of instanceof and casting.
+			*
 			*/ 
-			String methodName = insn.getInvokedMethodName().replaceAll("\\(.*$", "");
-			String clsName = insn.getInvokedMethodClassName();
+			String methodName=null;
+			String clsName=null;
+			if(checkIJVMInvok) {
+				methodName = insn.getInvokedMethodName().replaceAll("\\(.*$", "");
+				clsName = insn.getInvokedMethodClassName();
+				
+			}
+			else if(insn instanceof JVMInvokeInstruction)
+			{
+				 methodName = ((JVMInvokeInstruction)insn).getInvokedMethodName().replaceAll("\\(.*$", "");
+				 clsName = ((JVMInvokeInstruction)insn).getInvokedMethodClassName();
+			}
+				
+			
 			if (classMethodNameMap.containsKey(clsName)) {
 				classMethodNameMap.get(clsName).add(methodName);
 			} else {

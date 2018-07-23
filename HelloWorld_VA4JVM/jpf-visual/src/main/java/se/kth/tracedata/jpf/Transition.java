@@ -101,6 +101,11 @@ public class Transition implements se.kth.tracedata.Transition, Iterable<Step>{
 	public String getOutput() {
 		return jpfTransition.getOutput();
 	}
+	@Override
+	public void addStep(Step step) {
+		
+	}
+	
 	
 	
 

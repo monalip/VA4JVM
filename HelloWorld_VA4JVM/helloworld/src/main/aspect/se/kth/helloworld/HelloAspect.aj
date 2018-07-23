@@ -17,9 +17,7 @@ public aspect HelloAspect {
 	   {
 		   System.out.println("The application has ended...");
 		   global.displayErrorTrace();
-		   
-		   
-		   
+	   
 	   }
 	   
 	

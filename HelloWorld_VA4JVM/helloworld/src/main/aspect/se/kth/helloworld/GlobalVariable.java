@@ -3,12 +3,14 @@ package se.kth.helloworld;
 
 
 import java.util.LinkedList;
+import java.util.Stack;
 
 import se.kth.tracedata.ChoiceGenerator;
 import se.kth.tracedata.Instruction;
 import se.kth.tracedata.Path;
 import se.kth.tracedata.ThreadInfo;
 import se.kth.tracedata.Transition;
+import se.kth.tracedata.jvm.JVMInvokeInstruction;
 import se.kth.tracedata.Step;
 
 public class GlobalVariable {
@@ -24,9 +26,12 @@ public class GlobalVariable {
 	ThreadInfo thread = new	se.kth.tracedata.jvm.ThreadInfo(0, "RUNNING", "main");
 	ChoiceGenerator<?> cg = new se.kth.tracedata.jvm.ChoiceGenerator<>("ROOT", false);
 	Transition tr = new se.kth.tracedata.jvm.Transition(cg,thread);
-	Instruction insn ;
+	Instruction insn = new JVMInvokeInstruction("App","division(int a , int b)");
 	Step s = new se.kth.tracedata.jvm.Step(insn); 
-	private GlobalVariable() {
+	
+	
+	private GlobalVariable()
+	{
 		
 	}
 	public static GlobalVariable getInstance()
@@ -38,20 +43,15 @@ public class GlobalVariable {
 		return instance;
 		
 	}
-	public void displayErrorTrace() {  
+	public void displayErrorTrace() { 
+		
 
 		se.kth.jpf_visual.ErrorTracePanel gui = new se.kth.jpf_visual.ErrorTracePanel();
 		
+			tr.addStep(s);
 			stack.add(tr);
 			Path p= new se.kth.tracedata.jvm.Path(app,stack);
-			
-			
-		
 			gui.drowJVMErrTrace(p, true);
-		
-		
-		
-
 		 }
 	
 
