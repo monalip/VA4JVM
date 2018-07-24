@@ -189,7 +189,7 @@ public class TraceData {
 					ThreadInfo ti = transition.getThreadInfo();
 					
 
-					//loadSynchronizedMethod(line, mi);
+					loadSynchronizedMethod(line, mi);
 
 					loadWaitNotify(line, insn, pi, height);
 

@@ -6,6 +6,7 @@ import se.kth.tracedata.MethodInfo;
 public class JVMInvokeInstruction extends se.kth.tracedata.JVMInvokeInstruction{
 	 protected String cname;
 	  protected String mname;
+	  MethodInfo mi;
 	  public JVMInvokeInstruction(String cname, String mname) {
 		this.cname = cname;
 		this.mname = mname;
@@ -14,8 +15,7 @@ public class JVMInvokeInstruction extends se.kth.tracedata.JVMInvokeInstruction{
 
 	@Override
 	public MethodInfo getMethodInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		return mi;
 	}
 
 	@Override
@@ -26,14 +26,12 @@ public class JVMInvokeInstruction extends se.kth.tracedata.JVMInvokeInstruction{
 
 	@Override
 	public String getInvokedMethodName() {
-		// TODO Auto-generated method stub
-		return cname;
+		return mname;
 	}
 
 	@Override
 	public String getInvokedMethodClassName() {
-		// TODO Auto-generated method stub
-		return mname;
+		return cname;
 	}
 
 	@Override
@@ -77,5 +75,9 @@ public class JVMInvokeInstruction extends se.kth.tracedata.JVMInvokeInstruction{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	 public void setMethodInfo(MethodInfo mi) {
+		 this.mi = mi;
+		  }
 
 }

@@ -14,5 +14,6 @@ public abstract class Instruction {
 	public  abstract boolean isInstanceofVirtualInv();
 	public  abstract boolean isInstanceofFieldIns();
 	public 	abstract String getVariableId();
+	public 	abstract void setMethodInfo(MethodInfo mi);
 	
 }

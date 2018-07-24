@@ -3,11 +3,11 @@ package se.kth.tracedata.jvm;
 import se.kth.tracedata.MethodInfo;
 
 public class Instruction extends se.kth.tracedata.Instruction{
+	MethodInfo mi;
 	
 	@Override
 	public MethodInfo getMethodInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		return mi;
 	}
 
 	@Override
@@ -70,5 +70,9 @@ public class Instruction extends se.kth.tracedata.Instruction{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	 public void setMethodInfo(MethodInfo mi) {
+		    this.mi = mi;
+		  }
 
 }

@@ -1,6 +1,6 @@
 package se.kth.tracedata.jpf;
 
-
+import se.kth.tracedata.MethodInfo;
 
 public class Instruction extends se.kth.tracedata.Instruction {
 	 gov.nasa.jpf.vm.Instruction jpfInstruction;
@@ -94,5 +94,9 @@ public class Instruction extends se.kth.tracedata.Instruction {
 	public String getVariableId() {
 		return ((gov.nasa.jpf.vm.bytecode.FieldInstruction)jpfInstruction).getVariableId();
 	}
+	@Override
+	 public void setMethodInfo(MethodInfo mi) {
+		  
+		  }
 	
 }
