@@ -4,10 +4,12 @@ public class ThreadInfo implements se.kth.tracedata.ThreadInfo{
 	int id;
 	String stateName;
 	String name ;
-	public ThreadInfo(int id, String stateName, String name) {
+	int lastLockRef;
+	public ThreadInfo(int id, String stateName, String name, int lastLockRef) {
 		this.id = id;
 		this.stateName = stateName;
 		this.name = name;
+		this.lastLockRef = lastLockRef;
 		
 	}
 
@@ -31,8 +33,8 @@ public class ThreadInfo implements se.kth.tracedata.ThreadInfo{
 
 	@Override
 	public String getNameOfLastLock(int lastLockRef) {
-		// TODO Auto-generated method stub
-		return null;
+		String lock="lastlock";
+		return lock.toString().replace("$", ".").replaceAll("@.*","");
 	}
 
 }

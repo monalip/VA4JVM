@@ -2,7 +2,7 @@ package se.kth.tracedata.jvm;
 
 import se.kth.tracedata.ThreadInfo;
 
-public class ChoiceGenerator<T> implements se.kth.tracedata.ChoiceGenerator<T>{
+public class ChoiceGenerator implements se.kth.tracedata.ChoiceGenerator<ThreadInfo>{
 	String id;
 	boolean isCascade;
 	 public ChoiceGenerator(String id,boolean isCascade) {
@@ -13,7 +13,6 @@ public class ChoiceGenerator<T> implements se.kth.tracedata.ChoiceGenerator<T>{
 
 	@Override
 	public String getId() {
-		// TODO Auto-generated method stub
 		return id;
 	}
 
@@ -25,8 +24,7 @@ public class ChoiceGenerator<T> implements se.kth.tracedata.ChoiceGenerator<T>{
 
 	@Override
 	public boolean isInstaceofThreadChoiceFromSet() {
-		// TODO Auto-generated method stub
-		return true;
+		return false;
 	}
 
 	@Override

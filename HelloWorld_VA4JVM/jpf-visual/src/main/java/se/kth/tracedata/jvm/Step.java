@@ -2,7 +2,7 @@ package se.kth.tracedata.jvm;
 
 
 import se.kth.tracedata.Instruction;
-import se.kth.tracedata.MethodInfo;
+
 
 public class Step implements se.kth.tracedata.Step{
 	Instruction insn;
@@ -34,7 +34,6 @@ public class Step implements se.kth.tracedata.Step{
 	}
 	@Override
 	public String getLocationString() {
-		// TODO Auto-generated method stub
 		return "App.java : 9";
 	}
 	@Override

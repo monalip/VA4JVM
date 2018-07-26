@@ -16,6 +16,10 @@ public class App extends Thread
         System.out.println("Value = "+result);
     }
 	private static int division(int a, int b) {
-		return a /b;
+		synchronized (App.class) {
+			return a /b;
+			
+		}
+	
 	}
 }

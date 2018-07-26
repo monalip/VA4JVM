@@ -34,7 +34,6 @@ public class Transition implements se.kth.tracedata.Transition,Iterable<Step>{
 
 	@Override
 	public ThreadInfo getThreadInfo() {
-		// TODO Auto-generated method stub
 		return ti;
 	}
 

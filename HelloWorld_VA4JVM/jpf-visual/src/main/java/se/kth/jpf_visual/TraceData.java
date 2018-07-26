@@ -9,15 +9,19 @@ import java.util.Set;
 
 
 import se.kth.tracedata.Left;
+import se.kth.tracedata.LockInstruction;
 import se.kth.tracedata.Pair;
 import se.kth.tracedata.ChoiceGenerator;
 import se.kth.tracedata.ClassInfo;
+import se.kth.tracedata.FieldInstruction;
 import se.kth.tracedata.Instruction;
 import se.kth.tracedata.MethodInfo;
 import se.kth.tracedata.Path;
 import se.kth.tracedata.Step;
+import se.kth.tracedata.ThreadChoiceFromSet;
 import se.kth.tracedata.ThreadInfo;
 import se.kth.tracedata.Transition;
+import se.kth.tracedata.VirtualInvocation;
 import se.kth.tracedata.JVMInvokeInstruction;
 
 
@@ -131,8 +135,8 @@ public class TraceData {
 
 				//if (cg instanceof ThreadChoiceFromSet) {
 				//if condition is checked with the isInstaceofThreadChoiceFromSet() method in choicegeneraotr 
-				
-				if (cg.isInstaceofThreadChoiceFromSet()) {
+			
+				if (cg.isInstaceofThreadChoiceFromSet() || cg instanceof ThreadChoiceFromSet) {
 					
 					ThreadInfo ti = transition.getThreadInfo();
 					processChoiceGenerator(cg, prevThreadIdx, pi, height, ti);
@@ -315,7 +319,7 @@ public class TraceData {
 	//check the insn instanceof VirtualInvocation using method isInstanceofVirtualInv()  
 	
 	private void loadWaitNotify(String line, Instruction insn, int pi, int height) {
-		if (line != null && insn.isInstanceofVirtualInv()) {
+		if (line != null && (insn.isInstanceofVirtualInv() || insn instanceof VirtualInvocation )) {
 			String insnStr = insn.toString();
 			if (insnStr.contains("java.lang.Object.wait()") || insnStr.contains("java.lang.Object.notify()")
 					|| insnStr.contains("java.lang.Object.notifyAll()")) {
@@ -331,7 +335,7 @@ public class TraceData {
 		
 	private void loadLockUnlock(String line, Instruction insn, MethodInfo mi, ThreadInfo ti, int pi, int height) {
 		
-		if (line != null && insn.isInstanceofLockIns())
+		if (line != null && (insn.isInstanceofLockIns() || insn instanceof LockInstruction))
 		{
 			/*
 			 * ElementInfo is used to get the name of the last lock that was used by a thread.
@@ -342,8 +346,19 @@ public class TraceData {
 			 *
 			 */
 			int lastLock = 0;
-			lastLock= insn.getLastLockRef();			
-			String fieldName = ti.getNameOfLastLock(insn.getLastLockRef());
+			String fieldName =null;
+			
+			if (insn.isInstanceofLockIns())
+			{
+				lastLock= insn.getLastLockRef();
+				fieldName = ti.getNameOfLastLock(lastLock);
+			}
+			else if( insn instanceof LockInstruction)
+			{
+				lastLock = ((LockInstruction)insn).getLastLockRef();
+				fieldName = ti.getNameOfLastLock(lastLock);
+			}
+			
 			Pair<Integer, Integer> pair = new Pair<>(pi, height - 1);
 
 			if (fieldNames.contains(fieldName)) {
@@ -382,11 +397,20 @@ public class TraceData {
 		//if (line != null && txtSrc != null && txtSrc.isSrc() && insn.isInstanceofFieldIns()) {
 		
 		
-		if(line != null && txtSrc != null && txtSrc.isSrc() && insn.isInstanceofFieldIns()) {
+		if(line != null && txtSrc != null && txtSrc.isSrc() && (insn.isInstanceofFieldIns() || insn instanceof FieldInstruction)) {
 			/*  as method directly created insde instruction adapter hence we can call it using insn object and the there no need of casting
 			* String name = ((FieldInstruction) insn).getVariableId();
 			* */
-			String name = insn.getVariableId();
+			String name = null;
+			if(insn.isInstanceofFieldIns())
+			{
+				name= insn.getVariableId();
+			}
+			else if (insn instanceof FieldInstruction)
+			{
+				name = ((FieldInstruction) insn).getVariableId();
+			}
+			
 			int dotPos = name.lastIndexOf(".");
 			if (dotPos == 0 || dotPos == name.length() - 1) {
 			} else {
@@ -479,11 +503,15 @@ public class TraceData {
 			 if it is a instace of that object then it will call the methods getInvokedMethodClassName() and getInvokedMethodName of instructions
 			 * 
 			 */
-				if (insn.isInstanceofVirtualInv())
+			
+			
+				if (insn.isInstanceofVirtualInv() || insn instanceof VirtualInvocation )
 				{
-				
-				String cName = insn.getInvokedMethodClassName();
-				String tmp = cName + "." + insn.getInvokedMethodName();
+					String cName = null;
+					String tmp = null;
+						cName = insn.getInvokedMethodClassName();
+						tmp = cName + "." + insn.getInvokedMethodName();
+					
 				Pair<Integer, Integer> pair = new Pair<>(tl.getGroupNum(), tl.getLineNum());
 
 				if (lockMethodName.contains(tmp)) {
