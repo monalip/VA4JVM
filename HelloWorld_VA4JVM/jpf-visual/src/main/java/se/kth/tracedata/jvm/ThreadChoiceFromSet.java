@@ -30,7 +30,6 @@ public class ThreadChoiceFromSet implements se.kth.tracedata.ThreadChoiceFromSet
 
 	@Override
 	public ThreadInfo getChoice(int idx) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
