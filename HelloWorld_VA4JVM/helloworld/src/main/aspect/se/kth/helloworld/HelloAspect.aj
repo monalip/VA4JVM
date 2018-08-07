@@ -18,18 +18,21 @@ public aspect HelloAspect {
 	 * */
 	after(Thread childThread) : call(public void java.lang.Thread.start()) && !within(HelloAspect) && target(childThread)
 	{
-		System.out.println("Thread inforamtion");
+		//System.out.println("Thread inforamtion");
 		System.out.println(" Thread name: "+ childThread.getName());
 		String threadName = childThread.getName();
-		System.out.println("Thread State:"+childThread.getState());
-		State threadState = childThread.getState();
+		//System.out.println("Thread State:"+childThread.getState());
+		String threadState = childThread.getState().toString();
 		long mainThreadId = Thread.currentThread().getId();
 		long childthreadId = childThread.getId() ;
 		//threadLocation = thisJoinPoint.getSourceLocation();
-		System.out.println("Main thread : Id: " + Thread.currentThread().getId() + " Thread name: "+Thread.currentThread().getName()+" Location:" + thisJoinPoint.getSourceLocation());;
+		/*System.out.println("Main thread : Id: " + Thread.currentThread().getId() + " Thread name: "+Thread.currentThread().getName()+" Location:" + thisJoinPoint.getSourceLocation());;
 		System.out.println("Child thread: Id: " + childThread.getId() + " Thread name: "+ childThread.getName()+" Location:" + thisJoinPoint.getSourceLocation());
 		System.out.println();
-		System.out.println();
+		System.out.println();*/
+		global.threadId = childthreadId;
+		global.tStateName=threadState;
+		global.threadName= threadName;
 	}
 	
 	/**
@@ -42,38 +45,40 @@ public aspect HelloAspect {
 	{
 		int i=0;
 		//System.out.println("After method "+ i+" \n");
-		Signature sign = thisJoinPointStaticPart.getSignature();
+		String sign = (thisJoinPointStaticPart.getSignature()).toString();
+		String locationName = sign.toString();
+		String sourceString = locationName.substring(locationName.lastIndexOf('.') + 1);
 		String packagename = thisJoinPoint.getSignature().getDeclaringTypeName();
 		String className = packagename.substring(packagename.lastIndexOf('.') + 1);
 		String methodName = thisJoinPoint.getSignature().getName();
-		//System.out.println("Method Name "+ sign.toString()+" \n");
+		String sourceLocation = thisJoinPoint.getSourceLocation().toString();
+		int lineNo = Integer.parseInt(sourceLocation.substring(sourceLocation.lastIndexOf(':') + 1));
+		System.out.println("Method Name "+ sourceString+" \n");
 		long thread = Thread.currentThread().getId();
-		
-			global.sig= sign.toString();	
-			global.cname=className;
-			global.mname=methodName;
+		String fieldName="";
+			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName);
 			global.createInvokeInstruction();
-			global.threadId = thread;
-		
 			
 	}
 	/**
 	 * 
 	 * field inforamtion
 	 * */
-    after() returning(Object field) : get(* se.kth.helloworld.App.*) && !within(HelloAspect){
-	Signature sign = thisJoinPointStaticPart.getSignature();
+    after() returning(Object field) : get( * *) && within(se.kth.helloworld.App)&& !within(HelloAspect){
+	String sign = (thisJoinPointStaticPart.getSignature()).toString();
 	String packagename = thisJoinPoint.getSignature().getDeclaringTypeName();
 	String className = packagename.substring(packagename.lastIndexOf('.') + 1);
 	String fieldName = thisJoinPoint.getSignature().getName();
-	//System.out.println("Field Name "+ thisJoinPoint.getSignature().getName()+" \n");
 	long thread = Thread.currentThread().getId();
-	
-		global.sig= sign.toString();	
-		global.fcname=className;
-		global.fname=fieldName;
+	String sourceLocation = thisJoinPoint.getSourceLocation().toString();
+	String locationName = sign.toString();
+	int lineNo = Integer.parseInt(sourceLocation.substring(sourceLocation.lastIndexOf(':') + 1));
+	String methodName= "";
+	System.out.println("Field Name "+ className+" \n");
+	updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName);
+		
 		global.createFieldInstruction();
-		global.threadId = thread;
+	
 	
 	
 }
@@ -96,7 +101,18 @@ public aspect HelloAspect {
 	   
 	   }
 	   
-	
+	   public void updateGlobalVar(String sign,String className,String methodName,long thread,String sourceLocation,int lineNo,String fieldName)
+	   {
+		   global.sig= sign.toString();	
+			global.cname=className;
+			global.mname=methodName;
+			global.threadId = thread;
+			global.sourceLocation=sourceLocation;
+			global.locationNo = lineNo;
+			global.fname=fieldName;
+			
+		
+	   }
 
 
 	   

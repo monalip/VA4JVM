@@ -12,12 +12,6 @@ public class Transition implements se.kth.tracedata.Transition,Iterable<Step>{
 
 	  private Step first;
 	  se.kth.tracedata.jvm.Step last = new se.kth.tracedata.jvm.Step();
-	 
-	 
-
-	  
-	 
-	  
 	  int nSteps=0;
 
 	public Transition (ChoiceGenerator<?> cg, ThreadInfo ti) {
@@ -27,7 +21,6 @@ public class Transition implements se.kth.tracedata.Transition,Iterable<Step>{
 
 	@Override
 	public int getThreadIndex() {
-		// TODO Auto-generated method stub
 		return ti.getId();
 		
 	}
@@ -51,7 +44,6 @@ public class Transition implements se.kth.tracedata.Transition,Iterable<Step>{
 
 	@Override
 	public int getStepCount() {
-		// TODO Auto-generated method stub
 		return nSteps;
 	}
 

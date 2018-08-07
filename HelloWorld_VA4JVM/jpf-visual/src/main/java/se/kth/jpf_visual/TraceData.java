@@ -134,7 +134,8 @@ public class TraceData {
 				ChoiceGenerator<?> cg = transition.getChoiceGenerator();
 
 				//if (cg instanceof ThreadChoiceFromSet) {
-				//if condition is checked with the isInstaceofThreadChoiceFromSet() method in choicegeneraotr 
+				//if condition is checked with the isInstaceofThreadChoiceFromSet() method in choicegeneraotr for jpf error trace
+				//as the cg is of type jpf as we are using adapters
 			
 				if (cg.isInstaceofThreadChoiceFromSet() || cg instanceof ThreadChoiceFromSet) {
 					

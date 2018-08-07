@@ -1,16 +1,47 @@
 package se.kth.helloworld;
 
-
 /**
  * Hello world!
  *
  */
-public class App extends Thread
+public class App 
 {
-	static int a;
-	static int b;
-	int result;
-	int add;
+	static int a = 3;
+	static int b = 5;
+
+	
+   public App()
+   {
+	 this.a =1;
+	 this.b= 2;
+   }
+	
+	public static void main( String[] args )
+    {
+		int result;
+        result = add(a, b);
+        
+        MyThread t = new MyThread();
+ 
+       t.start();
+       
+       
+
+    }
+
+	private static int add(int a2, int b2) {
+		
+		return a2+b2;
+	}
+	
+
+}
+class MyThread extends Thread
+{	public String name;
+	
+	public MyThread() {
+		this.name = "Monali";
+	}
 	public void run()
 	{
 		int m,n,r;
@@ -18,47 +49,12 @@ public class App extends Thread
 		n = 2;
 		r = threadadd(m,n);
 		System.out.println("ChildThread"+r);
+		
+		
+	}
+	 private int threadadd(int m, int n) {
+			return m + n;
 			
-		
-		
-		
-	}
-    private int threadadd(int m, int n) {
-		return m + n;
-		
-		
-	}
-	
-	public static void main( String[] args )
-    {
-		int a1 ,b1 ,result,add;
-        a1 = 4;
-        b1 =0 ;
-        
-        Thread t = new Thread();
-        Thread t1 = new Thread();
-        t.start();
-        t1.start();
-       
-        add = addition(a,b);
-        result = division(a,b);
-        displayResult(result);
-        //System.out.println("Value = "+result);
-    }
-	private static int addition(int a, int b) {
-		return a +b;
-	}
-	private static void displayResult(int result) {
-		
-		System.out.println("Value = "+result);
-	}
-	private static int division(int a, int b) {
-		synchronized (App.class) {
-			return a /b;
 			
 		}
-		
-	
-	}
 }
-

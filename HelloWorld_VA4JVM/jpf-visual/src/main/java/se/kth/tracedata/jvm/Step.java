@@ -7,11 +7,15 @@ import se.kth.tracedata.Instruction;
 public class Step implements se.kth.tracedata.Step{
 	Instruction insn;
 	Step next;
+	String lineString;
+	String locationString;
 	
-	 public Step(Instruction insn) {
+	 public Step(Instruction insn, String lineString, String locationString) {
 		 if (insn == null)
 		      throw new IllegalArgumentException("insn == null");
 		 this.insn = insn;
+		 this.lineString = lineString;
+		 this.locationString = locationString;
 		 
 		  }
 	 public Step() {
@@ -30,11 +34,11 @@ public class Step implements se.kth.tracedata.Step{
 	      }
 	    }*/
 
-	    return "result = division(a,b);";
+	    return lineString;
 	}
 	@Override
 	public String getLocationString() {
-		return "App.java : 9";
+		return locationString;
 	}
 	@Override
 	public Instruction getInstruction() {

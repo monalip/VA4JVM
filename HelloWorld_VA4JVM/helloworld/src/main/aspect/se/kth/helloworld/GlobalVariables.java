@@ -2,8 +2,18 @@ package se.kth.helloworld;
 
 
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.Stack;
+import java.util.Scanner;
+import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
+import java.nio.file.Paths;
+import java.nio.file.Files;
 
 import se.kth.tracedata.ChoiceGenerator;
 import se.kth.tracedata.ClassInfo;
@@ -38,16 +48,23 @@ public class GlobalVariables {
 	boolean isMethodSync = true;
 	ClassInfo ci = new se.kth.tracedata.jvm.ClassInfo(cname);
 	MethodInfo mi = new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig);
-	ThreadInfo thread = new	se.kth.tracedata.jvm.ThreadInfo(0, "LOCK", "main",lastLockRef);
+	
 	ChoiceGenerator<ThreadInfo> cg = new ThreadChoiceFromSet("ROOT", false);
 	//ChoiceGenerator<ThreadInfo> cg1 = new ThreadChoiceFromSet("ROOT", false);
 	Transition tr ;
 	Instruction insn;
 	Step step;
 	long threadId;
+	String tStateName= null;
+	String threadName= null;
+	String sourceString;
+	String sourceLocation;
+	int locationNo=0;
+	String lastlockName= "App";
+	ThreadInfo thread = new	se.kth.tracedata.jvm.ThreadInfo(0, "ROOT", "main",lastLockRef,lastlockName);
+
 	
-	
-	
+
 	
 	private GlobalVariables()
 	{
@@ -76,9 +93,9 @@ public class GlobalVariables {
 	
 	static void createFieldInstruction()
 	{
+		
 		long currentThread = Thread.currentThread().getId();
-	
-		instance.insn = new FieldInstruction(instance.fname,instance.fcname);
+		instance.insn = new FieldInstruction(instance.fname,instance.cname);
 		instance.insn.setMethodInfo(instance.mi);
 		addPreviousStep();
 		
@@ -90,7 +107,19 @@ public class GlobalVariables {
 		 instance.tr = new se.kth.tracedata.jvm.Transition(instance.cg,instance.thread);
 		   }
 		   assert(instance.insn != null);
-		   instance.step = new se.kth.tracedata.jvm.Step(instance.insn);
+		   //code to get the partivular line source code
+		   try
+			{
+			   System.out.println(instance.locationNo-1);
+			   instance.sourceString = Files.readAllLines(Paths.get("./helloworld/src/main/java/se/kth/helloworld/App.java")).get(instance.locationNo-1);
+				
+				System.out.println(instance.sourceString);
+				
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		   instance.step = new se.kth.tracedata.jvm.Step(instance.insn,instance.sourceString,instance.sourceLocation);
 		   (instance.tr).addStep(instance.step);
 		   addPreviousTr();
 	}
@@ -103,7 +132,9 @@ public class GlobalVariables {
 	
 
 
-	public void displayErrorTrace() { 
+	public void displayErrorTrace() {
+		
+		
 		se.kth.jpf_visual.ErrorTracePanel gui = new se.kth.jpf_visual.ErrorTracePanel();
 			Path p= new se.kth.tracedata.jvm.Path(app,stack);
 			gui.drowJVMErrTrace(p, true);
@@ -123,4 +154,3 @@ if ((currentTransition == null) || (currentThread != thread)) {
 thread = currentThread;
 return currentTransition;
 }*/
-

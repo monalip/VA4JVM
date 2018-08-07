@@ -1,40 +1,38 @@
 package se.kth.tracedata.jvm;
 
 public class ThreadInfo implements se.kth.tracedata.ThreadInfo{
-	int id;
+	long id;
 	String stateName;
 	String name ;
 	int lastLockRef;
-	public ThreadInfo(int id, String stateName, String name, int lastLockRef) {
+	String lastLockName;
+	public ThreadInfo(long id, String stateName, String name, int lastLockRef,String lastLockName) {
 		this.id = id;
 		this.stateName = stateName;
 		this.name = name;
 		this.lastLockRef = lastLockRef;
+		this.lastLockName = lastLockName;
 		
 	}
 
 	@Override
 	public int getId() {
-		// TODO Auto-generated method stub
-		return id;
+		return (int) id;
 	}
 
 	@Override
 	public String getStateName() {
-		// TODO Auto-generated method stub
 		return stateName;
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return name;
 	}
 
 	@Override
 	public String getNameOfLastLock(int lastLockRef) {
-		String lock="lastlock";
-		return lock.toString().replace("$", ".").replaceAll("@.*","");
+		return lastLockName;
 	}
 
 }
