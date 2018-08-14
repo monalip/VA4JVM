@@ -1,5 +1,6 @@
 
-public class App 
+
+public class App  
 {
 	static int a = 3;
 	static int b = 5;
@@ -13,12 +14,14 @@ public class App
 	
 	public static void main( String[] args )
     {
+		App app = new App();
 		int result;
         result = add(a, b);
         
         MyThread t = new MyThread();
  
-        t.start();
+       t.start();
+      
        
        
 
@@ -41,15 +44,15 @@ class MyThread extends Thread
 	{
 		int m,n,r;
 		m = 1;
-		n = 0;
+		n = 2;
 		r = threadadd(m,n);
-		System.out.println("ChildThread"+r);
-		r = m/n;
-		System.out.println("ChildThread"+r);
+		System.out.println("ChildThread "+r);
 		
 		
 	}
 	 private int threadadd(int m, int n) {
+		 int result;
+		 result = 4/0;
 			return m + n;
 			
 			

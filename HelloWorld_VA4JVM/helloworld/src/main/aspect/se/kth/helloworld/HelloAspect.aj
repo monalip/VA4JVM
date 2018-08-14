@@ -7,10 +7,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
 import java.lang.Thread.State;
-import java.lang.reflect.Field;
-
-
-public aspect HelloAspect {
+ aspect HelloAspect {
 	static GlobalVariables global=GlobalVariables.getInstance();
 	/**
 	 * 
@@ -19,7 +16,7 @@ public aspect HelloAspect {
 	after(Thread childThread) : call(public void java.lang.Thread.start()) && !within(HelloAspect) && target(childThread)
 	{
 		//System.out.println("Thread inforamtion");
-		System.out.println(" Thread name: "+ childThread.getName());
+		//System.out.println(" Thread name: "+ childThread.getName());
 		String threadName = childThread.getName();
 		//System.out.println("Thread State:"+childThread.getState());
 		String threadState = childThread.getState().toString();
@@ -40,7 +37,7 @@ public aspect HelloAspect {
 	 * method inforamtion
 	 * */
 
-	pointcut traceMethod(): (execution (* *(..))&& !cflow(within(HelloAspect)));
+	pointcut traceMethod(): (execution (* *.*(..)) || execution(*.new(..)) || initialization(*.new(..)) || call(void java.io.PrintStream.println(..)) || call(public void java.lang.Thread.start()))   && !cflow(within(HelloAspect)) ;
 	after(): traceMethod()
 	{
 		int i=0;
@@ -53,7 +50,8 @@ public aspect HelloAspect {
 		String methodName = thisJoinPoint.getSignature().getName();
 		String sourceLocation = thisJoinPoint.getSourceLocation().toString();
 		int lineNo = Integer.parseInt(sourceLocation.substring(sourceLocation.lastIndexOf(':') + 1));
-		System.out.println("Method Name "+ sourceString+" \n");
+		//System.out.println("Method Name "+ sourceString+" \n");
+		//System.out.println("ThreadId Name "+ Thread.currentThread().getId()+" \n");
 		long thread = Thread.currentThread().getId();
 		String fieldName="";
 			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName);
@@ -64,7 +62,10 @@ public aspect HelloAspect {
 	 * 
 	 * field inforamtion
 	 * */
-    after() returning(Object field) : get( * *) && within(se.kth.helloworld.App)&& !within(HelloAspect){
+	pointcut getObject() : get(* *) && (within(se.kth.helloworld.App) )&& !within(HelloAspect);
+	after() : getObject()
+	{
+   // after() returning(Object field) : get( * *) && within(se.kth.helloworld.App)&& !within(HelloAspect){
 	String sign = (thisJoinPointStaticPart.getSignature()).toString();
 	String packagename = thisJoinPoint.getSignature().getDeclaringTypeName();
 	String className = packagename.substring(packagename.lastIndexOf('.') + 1);
@@ -74,7 +75,8 @@ public aspect HelloAspect {
 	String locationName = sign.toString();
 	int lineNo = Integer.parseInt(sourceLocation.substring(sourceLocation.lastIndexOf(':') + 1));
 	String methodName= "";
-	System.out.println("Field Name "+ className+" \n");
+	//System.out.println("Field Name "+ className+" \n");
+	//System.out.println("ThreadId Name "+ Thread.currentThread().getId()+" \n");
 	updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName);
 		
 		global.createFieldInstruction();

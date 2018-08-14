@@ -4,6 +4,7 @@ import se.kth.tracedata.MethodInfo;
 
 public class Instruction extends se.kth.tracedata.Instruction {
 	 gov.nasa.jpf.vm.Instruction jpfInstruction;
+	 
 	
 	public Instruction(gov.nasa.jpf.vm.Instruction jpfInstruction)
 	{
@@ -11,7 +12,7 @@ public class Instruction extends se.kth.tracedata.Instruction {
 	}
 	@Override
 	public MethodInfo getMethodInfo() {
-		return new MethodInfo(jpfInstruction.getMethodInfo());
+		return new se.kth.tracedata.jpf.MethodInfo(jpfInstruction.getMethodInfo());
 	}
 	@Override
 	public String getFileLocation() {
@@ -95,8 +96,10 @@ public class Instruction extends se.kth.tracedata.Instruction {
 		return ((gov.nasa.jpf.vm.bytecode.FieldInstruction)jpfInstruction).getVariableId();
 	}
 	@Override
-	 public void setMethodInfo(MethodInfo mi) {
-		  
-		  }
+	public void setMethodInfo(MethodInfo mi)
+	{
+	}
+	
+	
 	
 }

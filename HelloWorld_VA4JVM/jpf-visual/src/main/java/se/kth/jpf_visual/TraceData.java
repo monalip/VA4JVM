@@ -562,7 +562,7 @@ public class TraceData {
 			} 
 			//else if (insn instanceof FieldInstruction) {
 			//if condition is checked using method isInstanceofFieldIns()
-			else if (insn.isInstanceofFieldIns()) {
+			else if (insn.isInstanceofFieldIns() || insn instanceof FieldInstruction) {
 				/*
 				//method is called directly using insn object as method is now created inside instreuction adapter itsel instade of FieldInstruction class
 				//hence there is no need of seperate FieldInstruction class
@@ -603,14 +603,13 @@ public class TraceData {
 		for (int si = tl.getStartStep(); si <= tl.getEndStep(); si++) {
 			Step step = tl.getTransition().getStep(si);
 			Instruction insn = step.getInstruction();
-			boolean checkJVMInvok = insn.isInstanceofJVMInvok(); 
 			String cName = insn.getMethodInfo().getClassInfo().getName();
 			if (cName.equals(srcMap.get(insn.getFileLocation()))) {
 				targetSet.add(new Pair<Integer, Integer>(tl.getGroupNum(), tl.getLineNum()));
 				break;
 			} 
 			//else if (insn instanceof JVMInvokeInstruction) {
-			else if(checkJVMInvok) {
+			else if(insn.isInstanceofJVMInvok() || insn instanceof JVMInvokeInstruction) {
 				//String mName = ((JVMInvokeInstruction) insn).getInvokedMethodName().replaceAll("\\(.*$", "");
 				String mName = insn.getInvokedMethodName().replaceAll("\\(.*$", "");
 

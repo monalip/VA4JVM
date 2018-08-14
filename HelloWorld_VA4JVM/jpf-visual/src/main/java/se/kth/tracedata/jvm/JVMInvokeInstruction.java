@@ -6,10 +6,12 @@ import se.kth.tracedata.MethodInfo;
 public class JVMInvokeInstruction extends se.kth.tracedata.JVMInvokeInstruction{
 	 protected String cname;
 	  protected String mname;
+	  protected String sourceLocation;
 	  MethodInfo mi;
-	  public JVMInvokeInstruction(String cname, String mname) {
+	  public JVMInvokeInstruction(String cname, String mname,String sourceLocation) {
 		this.cname = cname;
 		this.mname = mname;
+		this.sourceLocation = sourceLocation;
 	}
 	
 
@@ -20,8 +22,7 @@ public class JVMInvokeInstruction extends se.kth.tracedata.JVMInvokeInstruction{
 
 	@Override
 	public String getFileLocation() {
-		// TODO Auto-generated method stub
-		return null;
+		return sourceLocation;
 	}
 
 	@Override

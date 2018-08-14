@@ -46,8 +46,8 @@ public class GlobalVariables {
 	String fcname = null;
 	LinkedList<Transition> stack=new LinkedList<Transition>();
 	boolean isMethodSync = true;
-	ClassInfo ci = new se.kth.tracedata.jvm.ClassInfo(cname);
-	MethodInfo mi = new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig);
+	ClassInfo ci ;
+	MethodInfo mi ;
 	
 	ChoiceGenerator<ThreadInfo> cg = new ThreadChoiceFromSet("ROOT", false);
 	//ChoiceGenerator<ThreadInfo> cg1 = new ThreadChoiceFromSet("ROOT", false);
@@ -61,7 +61,8 @@ public class GlobalVariables {
 	String sourceLocation;
 	int locationNo=0;
 	String lastlockName= "App";
-	ThreadInfo thread = new	se.kth.tracedata.jvm.ThreadInfo(0, "ROOT", "main",lastLockRef,lastlockName);
+	ThreadInfo thread;
+	//= new	se.kth.tracedata.jvm.ThreadInfo(0, "ROOT", "main",lastLockRef,lastlockName);
 
 	
 
@@ -82,9 +83,25 @@ public class GlobalVariables {
 	}
 	static void createInvokeInstruction()
 	{
+		instance.ci=new se.kth.tracedata.jvm.ClassInfo(instance.cname);
+		instance.mi= new se.kth.tracedata.jvm.MethodInfo(instance.ci,instance.mname,instance.sig);
 		long currentThread = Thread.currentThread().getId();
 		
-		instance.insn = new JVMInvokeInstruction(instance.cname,instance.mname);
+		//code to get the partivular line source code
+		   try
+			{
+			   // get path of current directory System.out.println(new File(".").getAbsoluteFile());
+			   //For maven 
+			   instance.sourceString = Files.readAllLines(Paths.get("./helloworld/src/main/java/se/kth/helloworld/App.java")).get(instance.locationNo-1);
+			   //For eclipse 
+			   //instance.sourceString = (Files.readAllLines(Paths.get("./src/main/java/se/kth/helloworld/App.java")).get(instance.locationNo-1)).trim();
+			   
+				
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		instance.insn = new JVMInvokeInstruction(instance.cname,instance.mname,instance.sourceString);
 		instance.insn.setMethodInfo(instance.mi);
 		addPreviousStep();
 		
@@ -103,35 +120,45 @@ public class GlobalVariables {
 	}
 	
 	static void addPreviousStep() {
-	 if (instance.tr == null) {
+		long currentThreadId = Thread.currentThread().getId();
+	 if ((instance.tr == null) || (currentThreadId != instance.threadId))
+	 {
+		
+		 if(currentThreadId == 12)
+		 {
+			 instance.threadId = 0;
+			 instance.threadName = "main";
+		 }
+		 else if(currentThreadId == 13)
+		 {
+			 instance.threadId = 1;
+			 instance.threadName = Thread.currentThread().getName();
+		 }
+		 
+		 
+		 instance.tStateName = Thread.currentThread().getState().toString();
+		 instance.cg = new ThreadChoiceFromSet("ROOT", false);
+		 instance.thread = new	se.kth.tracedata.jvm.ThreadInfo(instance.threadId, instance.tStateName, instance.threadName,instance.lastLockRef,instance.lastlockName);
+		 //instance.thread = new se.kth.tracedata.jvm.ThreadInfo(instance.threadId, instance.tStateName,instance.threadName,instance.lastLockRef,instance.lastlockName);
 		 instance.tr = new se.kth.tracedata.jvm.Transition(instance.cg,instance.thread);
-		   }
+	 }
 		   assert(instance.insn != null);
-		   //code to get the partivular line source code
-		   try
-			{
-			   System.out.println(instance.locationNo-1);
-			   instance.sourceString = Files.readAllLines(Paths.get("./helloworld/src/main/java/se/kth/helloworld/App.java")).get(instance.locationNo-1);
-				
-				System.out.println(instance.sourceString);
-				
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
+		   
 		   instance.step = new se.kth.tracedata.jvm.Step(instance.insn,instance.sourceString,instance.sourceLocation);
 		   (instance.tr).addStep(instance.step);
-		   addPreviousTr();
+		   
+			   addPreviousTr(instance.tr);
+		   
+		   
 	}
-	static void addPreviousTr() {
-		   assert (instance.tr != null);
-		   instance.stack.add(instance.tr);
-		   instance.tr = new se.kth.tracedata.jvm.Transition(instance.cg,instance.thread); // reset transition record
+	static void addPreviousTr(Transition tr) {
+		   assert (tr != null);
+		   instance.stack.add(tr);
+		   tr = new se.kth.tracedata.jvm.Transition(null,null); // reset transition record
 		}
 	
 	
-
-
+	
 	public void displayErrorTrace() {
 		
 		

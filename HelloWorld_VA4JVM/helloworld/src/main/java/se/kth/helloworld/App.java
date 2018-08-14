@@ -18,13 +18,14 @@ public class App
 	
 	public static void main( String[] args )
     {
+		App app = new App();
 		int result;
         result = add(a, b);
         
         MyThread t = new MyThread();
+
  
-       t.start();
-       
+       t.start();       
        
 
     }
@@ -37,7 +38,8 @@ public class App
 
 }
 class MyThread extends Thread
-{	public String name;
+{	
+	public String name;
 	
 	public MyThread() {
 		this.name = "Monali";
@@ -48,7 +50,7 @@ class MyThread extends Thread
 		m = 1;
 		n = 2;
 		r = threadadd(m,n);
-		System.out.println("ChildThread"+r);
+		System.out.println("ChildThread "+r);
 		
 		
 	}
