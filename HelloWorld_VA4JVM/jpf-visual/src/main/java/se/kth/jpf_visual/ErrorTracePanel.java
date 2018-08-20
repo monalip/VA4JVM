@@ -103,7 +103,7 @@ public class ErrorTracePanel extends JPanel{
 			tablePanel.setBackground(Color.white);
 			tablePanel.add(splitPane);
 			//set the size of frame
-			frame.setSize(1200, 600);
+			frame.setSize(1000, 600);
 			//frame.pack();
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			//Display the frame at the center

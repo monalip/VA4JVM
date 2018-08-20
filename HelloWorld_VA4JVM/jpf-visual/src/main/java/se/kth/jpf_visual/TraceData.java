@@ -33,10 +33,11 @@ public class TraceData {
 
 	private int numOfThreads = -1;
 	private List<String> threadNames = null;
+	
 
 	private Path path;
 	
-	
+	private Set<Integer> threadId = new HashSet<>();
 	
 
 	private List<Pair<Integer, Integer>> group = new ArrayList<>();
@@ -84,8 +85,12 @@ public class TraceData {
 	
 		for(Transition t: path) {
 			int currThread = t.getThreadIndex();
-			if (threadNames.size() == currThread) {
+			
+			//Logic to add the unique thread Name
+			//if ((threadNames.size() == currThread) || !(threadId.contains(currThread))) {
+			if ( !(threadId.contains(currThread)) && currThread > prevThread) {
 				threadNames.add(t.getThreadInfo().getName());
+				threadId.add(currThread);
 			}
 			if (currTran == 0) {
 				start = 0;
@@ -140,7 +145,9 @@ public class TraceData {
 				if (cg.isInstaceofThreadChoiceFromSet() || cg instanceof ThreadChoiceFromSet) {
 					
 					ThreadInfo ti = transition.getThreadInfo();
-					processChoiceGenerator(cg, prevThreadIdx, pi, height, ti);
+					
+						processChoiceGenerator(cg, prevThreadIdx, pi, height, ti);
+					
 				}
 
 				tempStr.append(cg + "\n");
@@ -238,7 +245,7 @@ public class TraceData {
 	
 	private void processChoiceGenerator(ChoiceGenerator<?> cg, int prevThreadIdx, int pi, int height, ThreadInfo ti) {
 		// thread start/join highlight
-		if (cg.getId() == "START" || cg.getId() == "JOIN") {
+		if ((cg.getId() == "START" || cg.getId() == "JOIN") && height>0) {
 			if (lineTable.get(pi).getTextLine(height - 1).isSrc()) {
 				threadStartSet.add(new Pair<>(pi, height - 1));
 			}
@@ -267,7 +274,18 @@ public class TraceData {
 			//we have created method getChoice() directly inside the choicegenerator so we can access it
 			// with choicegenerator object we donot need casting 
 			//int tid = ((ThreadChoiceFromSet) cg).getChoice(cg.getTotalNumberOfChoices() - 1).getId();
-			int tid = cg.getChoice(cg.getTotalNumberOfChoices() - 1).getId();
+			int tid =0;
+			if(cg.getTotalNumberOfChoices() == 0)
+			{
+				tid = ((ThreadChoiceFromSet) cg).getThreadId();
+			}
+			else
+			{
+				//we have created method getChoice() directly inside the choicegenerator so we can access it
+				// with choicegenerator object we donot need casting  for jpf error trace
+			
+				tid =cg.getChoice(cg.getTotalNumberOfChoices() - 1).getId();
+			}
 			Pair<Integer, String> threadState = new Pair<>(tid, "START");
 
 			ArrayList<Pair<Integer, String>> list = new ArrayList<>();
