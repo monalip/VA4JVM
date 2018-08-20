@@ -178,8 +178,8 @@ public class RuntimeData {
 		 instance.threadId = Thread.currentThread().getId();
 		 instance.threadName = Thread.currentThread().getName();
 		 instance.tStateName = Thread.currentThread().getState().toString();
+		 instance.threadName = instance.threadName.substring(instance.threadName.lastIndexOf('.') + 1);
 		 instance.thread = new	se.kth.tracedata.jvm.ThreadInfo(instance.threadId, instance.tStateName, instance.threadName,instance.lastLockRef,instance.lastlockName);
-		 //System.out.println("Thread State "+ instance.tStateName);
 		return (instance.thread);
 	}
 	static ChoiceGenerator<ThreadInfo> updateChoiceGenerator(String methodName, int i)
@@ -220,3 +220,4 @@ if ((currentTransition == null) || (currentThread != thread)) {
 thread = currentThread;
 return currentTransition;
 }*/
+
