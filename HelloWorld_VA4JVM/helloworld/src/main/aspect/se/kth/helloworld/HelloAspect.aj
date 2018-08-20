@@ -8,7 +8,32 @@ import org.aspectj.lang.annotation.Pointcut;
 
 import java.lang.Thread.State;
  aspect HelloAspect {
-	static GlobalVariables global=GlobalVariables.getInstance();
+	static  RuntimeData global= RuntimeData.getInstance();
+	
+	private static boolean DEBUG = false;
+    before() :
+        if(!DEBUG) && (
+            call(* Thread+.start()) ||
+            call(* ExecutorService+.execute(..)) ||
+            call(* ExecutorService+.submit(..)) ||
+            call(* ExecutorService+.invokeAll(..)) ||
+            call(* ExecutorService+.invokeAny(..)) ||
+            call(* ScheduledExecutorService.scheduleAtFixedRate(..))
+        )
+    {
+        System.out.println("First:   "+thisJoinPoint);
+    }
+
+    before() :
+        if(DEBUG) &&
+        within(*) &&
+        !within(HelloAspect) &&
+        !get(* *) &&
+        !call(* println(..))
+    {
+        System.out.println("Second: " +thisJoinPoint);
+    }
+	
 	/**
 	 * 
 	 * thread inforamtion
@@ -30,6 +55,8 @@ import java.lang.Thread.State;
 		global.threadId = childthreadId;
 		global.tStateName=threadState;
 		global.threadName= threadName;
+		//System.out.println(" Thread State: "+ threadState);
+		
 	}
 	
 	/**
@@ -37,8 +64,10 @@ import java.lang.Thread.State;
 	 * method inforamtion
 	 * */
 
-	pointcut traceMethod(): (execution (* *.*(..)) || execution(*.new(..)) || initialization(*.new(..)) || call(void java.io.PrintStream.println(..)) || call(public void java.lang.Thread.start()))   && !cflow(within(HelloAspect)) ;
-	after(): traceMethod()
+	//pointcut traceMethod(): (execution (* *.*(..)) || execution(*.new(..)) || initialization(*.new(..)) || call(void java.io.PrintStream.println(..)) || call(public void java.lang.Thread.start()))   && !cflow(within(HelloAspect)) ;
+	pointcut traceMethod(): (execution (* *.*(..)) || execution(*.new(..)) || initialization(*.new(..)) || call(* println(..)) || call(* Thread+.start()) || call(* java..*.*(..)))   && !cflow(within(HelloAspect)) ;
+
+	after(): traceMethod() 
 	{
 		int i=0;
 		//System.out.println("After method "+ i+" \n");
@@ -50,8 +79,11 @@ import java.lang.Thread.State;
 		String methodName = thisJoinPoint.getSignature().getName();
 		String sourceLocation = thisJoinPoint.getSourceLocation().toString();
 		int lineNo = Integer.parseInt(sourceLocation.substring(sourceLocation.lastIndexOf(':') + 1));
-		//System.out.println("Method Name "+ sourceString+" \n");
-		//System.out.println("ThreadId Name "+ Thread.currentThread().getId()+" \n");
+			//System.out.println("Method Name "+ methodName+" \n");
+			//System.out.println("ThreadId Name "+ Thread.currentThread().getId()+" \n");
+			//System.out.println("sourceString "+ sourceString+" \n");
+		
+		
 		long thread = Thread.currentThread().getId();
 		String fieldName="";
 			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName);
@@ -62,42 +94,43 @@ import java.lang.Thread.State;
 	 * 
 	 * field inforamtion
 	 * */
-	pointcut getObject() : get(* *) && (within(se.kth.helloworld.App) )&& !within(HelloAspect);
+	pointcut getObject() : get(* *) && within(se.kth.helloworld.App) && !within(HelloAspect);
 	after() : getObject()
 	{
-   // after() returning(Object field) : get( * *) && within(se.kth.helloworld.App)&& !within(HelloAspect){
-	String sign = (thisJoinPointStaticPart.getSignature()).toString();
-	String packagename = thisJoinPoint.getSignature().getDeclaringTypeName();
-	String className = packagename.substring(packagename.lastIndexOf('.') + 1);
-	String fieldName = thisJoinPoint.getSignature().getName();
-	long thread = Thread.currentThread().getId();
-	String sourceLocation = thisJoinPoint.getSourceLocation().toString();
-	String locationName = sign.toString();
-	int lineNo = Integer.parseInt(sourceLocation.substring(sourceLocation.lastIndexOf(':') + 1));
-	String methodName= "";
-	//System.out.println("Field Name "+ className+" \n");
-	//System.out.println("ThreadId Name "+ Thread.currentThread().getId()+" \n");
-	updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName);
-		
-		global.createFieldInstruction();
+		   // after() returning(Object field) : get( * *) && within(se.kth.helloworld.App)&& !within(HelloAspect){
+			String sign = (thisJoinPointStaticPart.getSignature()).toString();
+			String packagename = thisJoinPoint.getSignature().getDeclaringTypeName();
+			String className = packagename.substring(packagename.lastIndexOf('.') + 1);
+			String fieldName = thisJoinPoint.getSignature().getName();
+			long thread = Thread.currentThread().getId();
+			String sourceLocation = thisJoinPoint.getSourceLocation().toString();
+			String locationName = sign.toString();
+			int lineNo = Integer.parseInt(sourceLocation.substring(sourceLocation.lastIndexOf(':') + 1));
+			String methodName= "";
+			//System.out.println("Field Name "+ className+" \n");
+			//System.out.println("ThreadId Name "+ Thread.currentThread().getId()+" \n");
+			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName);
+				
+				global.createFieldInstruction();
+			
 	
 	
-	
-}
-
+	}
 	/*
 	 * 
 	 * Instrument the end of main method before start the visualization 
 	 * 
 	 * 
 	 */
-	pointcut mainMethod() : execution(public static void main(String[]));
+	
+		pointcut mainMethod() : execution(public static void main(String[]));
 	/**
 	 * Pointcut to trace the execution of every method in class as long as the control flow isn’t in the current class
 	 */
-	
-	   after() : mainMethod()
+		
+	   after() : mainMethod() 
 	   {
+		 
 		   System.out.println("The application has ended...");
 		   global.displayErrorTrace();
 	   
@@ -115,7 +148,7 @@ import java.lang.Thread.State;
 			
 		
 	   }
-
+	   
 
 	   
 	   
