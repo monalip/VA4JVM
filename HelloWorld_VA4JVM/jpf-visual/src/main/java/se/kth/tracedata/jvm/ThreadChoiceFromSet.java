@@ -5,9 +5,11 @@ import se.kth.tracedata.ThreadInfo;
 public class ThreadChoiceFromSet implements se.kth.tracedata.ThreadChoiceFromSet {
 	String id;
 	boolean isCascade;
-	 public ThreadChoiceFromSet(String id,boolean isCascade) {
+	int threadId;
+	 public ThreadChoiceFromSet(String id,boolean isCascade, long threadId) {
 		 this.id = id;
 		 this.isCascade = isCascade;
+		 this.threadId = (int) threadId;
 		
 	}
 
@@ -38,6 +40,12 @@ public class ThreadChoiceFromSet implements se.kth.tracedata.ThreadChoiceFromSet
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public int getThreadId() {
+		
+		return threadId;
+	}
+	
 
 	
 }
