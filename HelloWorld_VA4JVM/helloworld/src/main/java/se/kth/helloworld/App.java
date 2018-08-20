@@ -21,13 +21,11 @@ public class App
 		App app = new App();
 		int result;
         result = add(a, b);
-        
         MyThread t = new MyThread();
-
- 
-       t.start();       
+        t.start();
+        
        
-
+       
     }
 
 	private static int add(int a2, int b2) {
