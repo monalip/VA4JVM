@@ -1,7 +1,5 @@
 package se.kth.helloworld;
 
-
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,15 +27,15 @@ import se.kth.tracedata.jvm.ThreadChoiceFromSet;
 import se.kth.tracedata.jvm.VirtualInvocation;
 import se.kth.tracedata.Step;
 
-public class GlobalVariables {
+public class RuntimeData {
 	/**
 	 * We used Singleton pattern to 
 	 * 
 	 */
 	
 	// constructor is private to make this class cannot instantiate from outside
-	static  private GlobalVariables instance = null;
-	String app="Fix it!";
+	static  private  RuntimeData instance = null;
+	String app="Visualization";
 	String cname= null;
 	String mname = null;
 	String sig= null;
@@ -49,7 +47,8 @@ public class GlobalVariables {
 	ClassInfo ci ;
 	MethodInfo mi ;
 	
-	ChoiceGenerator<ThreadInfo> cg = new ThreadChoiceFromSet("ROOT", false);
+	ChoiceGenerator<ThreadInfo> cg;
+	String cgState;
 	//ChoiceGenerator<ThreadInfo> cg1 = new ThreadChoiceFromSet("ROOT", false);
 	Transition tr ;
 	Instruction insn;
@@ -64,30 +63,40 @@ public class GlobalVariables {
 	ThreadInfo thread;
 	//= new	se.kth.tracedata.jvm.ThreadInfo(0, "ROOT", "main",lastLockRef,lastlockName);
 
-	
+	int i =0;
 
 	
-	private GlobalVariables()
+	private  RuntimeData()
 	{
 		
 		
 	}
-	public static GlobalVariables getInstance()
+	public static  RuntimeData getInstance()
 	{
 		if(instance == null)
 		{
-			instance = new GlobalVariables();
+			instance = new  RuntimeData();
 		}
 		return instance;
 		
 	}
 	static void createInvokeInstruction()
-	{
+	{	
+		
+		//System.out.println("Value od i : "+i);
 		instance.ci=new se.kth.tracedata.jvm.ClassInfo(instance.cname);
 		instance.mi= new se.kth.tracedata.jvm.MethodInfo(instance.ci,instance.mname,instance.sig);
+		if(instance.i == 0 || instance.mname == "start")
+		{
+			instance.cg= updateChoiceGenerator(instance.mname,instance.i);
+		}
+		instance.i++;
+		
+		
+		
 		long currentThread = Thread.currentThread().getId();
 		
-		//code to get the partivular line source code
+		//code to get the particular line source code
 		   try
 			{
 			   // get path of current directory System.out.println(new File(".").getAbsoluteFile());
@@ -103,7 +112,8 @@ public class GlobalVariables {
 			}
 		instance.insn = new JVMInvokeInstruction(instance.cname,instance.mname,instance.sourceString);
 		instance.insn.setMethodInfo(instance.mi);
-		addPreviousStep();
+		addPreviousStep(instance.cg);
+	
 		
 		
 	}
@@ -111,43 +121,48 @@ public class GlobalVariables {
 	static void createFieldInstruction()
 	{
 		
-		long currentThread = Thread.currentThread().getId();
+		
 		instance.insn = new FieldInstruction(instance.fname,instance.cname);
 		instance.insn.setMethodInfo(instance.mi);
-		addPreviousStep();
+		if(instance.i == 0 || instance.mname == "start")
+		{
+			instance.cg= updateChoiceGenerator(instance.mname,instance.i);
+		}
+		instance.i++;
+		addPreviousStep(instance.cg);
 		
 		
 	}
 	
-	static void addPreviousStep() {
+	static void addPreviousStep(ChoiceGenerator<ThreadInfo> cg) {
 		long currentThreadId = Thread.currentThread().getId();
+		long id = instance.threadId;
+		
 	 if ((instance.tr == null) || (currentThreadId != instance.threadId))
 	 {
 		
-		 if(currentThreadId == 12)
-		 {
-			 instance.threadId = 0;
-			 instance.threadName = "main";
-		 }
-		 else if(currentThreadId == 13)
-		 {
-			 instance.threadId = 1;
-			 instance.threadName = Thread.currentThread().getName();
-		 }
-		 
-		 
-		 instance.tStateName = Thread.currentThread().getState().toString();
-		 instance.cg = new ThreadChoiceFromSet("ROOT", false);
-		 instance.thread = new	se.kth.tracedata.jvm.ThreadInfo(instance.threadId, instance.tStateName, instance.threadName,instance.lastLockRef,instance.lastlockName);
-		 //instance.thread = new se.kth.tracedata.jvm.ThreadInfo(instance.threadId, instance.tStateName,instance.threadName,instance.lastLockRef,instance.lastlockName);
-		 instance.tr = new se.kth.tracedata.jvm.Transition(instance.cg,instance.thread);
+		 instance.thread = updateThreadInfo();
+		  //instance.thread = new se.kth.tracedata.jvm.ThreadInfo(instance.threadId, instance.tStateName,instance.threadName,instance.lastLockRef,instance.lastlockName);
+		instance.threadId = id;
+	
+		
+		instance.tr = new se.kth.tracedata.jvm.Transition(cg,instance.thread);
 	 }
 		   assert(instance.insn != null);
 		   
 		   instance.step = new se.kth.tracedata.jvm.Step(instance.insn,instance.sourceString,instance.sourceLocation);
 		   (instance.tr).addStep(instance.step);
+		 if((currentThreadId != instance.threadId) )
+		 {
+		  
+			  addPreviousTr(instance.tr); 
+		 }
+		 else if (instance.stack.size() <= 0 && java.lang.Thread.activeCount() == 1)
+		 {
+			 addPreviousTr(instance.tr); 
+		 }
 		   
-			   addPreviousTr(instance.tr);
+			 
 		   
 		   
 	}
@@ -156,10 +171,34 @@ public class GlobalVariables {
 		   instance.stack.add(tr);
 		   tr = new se.kth.tracedata.jvm.Transition(null,null); // reset transition record
 		}
+	static ThreadInfo updateThreadInfo()
+	{
+		long currentThreadId = Thread.currentThread().getId();
+		 
+		 instance.threadId = Thread.currentThread().getId();
+		 instance.threadName = Thread.currentThread().getName();
+		 instance.tStateName = Thread.currentThread().getState().toString();
+		 instance.thread = new	se.kth.tracedata.jvm.ThreadInfo(instance.threadId, instance.tStateName, instance.threadName,instance.lastLockRef,instance.lastlockName);
+		 //System.out.println("Thread State "+ instance.tStateName);
+		return (instance.thread);
+	}
+	static ChoiceGenerator<ThreadInfo> updateChoiceGenerator(String methodName, int i)
+	{
+		long threadId = Thread.currentThread().getId();
+		if(i==0 ) {
+			instance.cg = new ThreadChoiceFromSet("ROOT", false,threadId); 
+			
+		}
+		else if(methodName == "start") {
+					
+			instance.cg = new ThreadChoiceFromSet("START", false,threadId); 		
+		}
+		return instance.cg;
+	}
 	
 	
 	
-	public void displayErrorTrace() {
+public void displayErrorTrace() {
 		
 		
 		se.kth.jpf_visual.ErrorTracePanel gui = new se.kth.jpf_visual.ErrorTracePanel();
