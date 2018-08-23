@@ -159,6 +159,7 @@ public class TraceData {
 				for (int si = 0; si < transition.getStepCount(); si++) {
 					Step s = transition.getStep(si);
 					String line = s.getLineString();
+					
 					if (line != null) {
 						String src = line.replaceAll("/\\*.*?\\*/", "").replaceAll("//.*$", "")
 								.replaceAll("/\\*.*$", "").replaceAll("^.*?\\*/", "").replaceAll("\\*.*$", "").trim();

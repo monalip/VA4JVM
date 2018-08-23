@@ -65,7 +65,7 @@ public class Transition implements se.kth.tracedata.Transition,Iterable<Step>{
 		    } 
 		else {
 			//As the next is the variable of the Step and with the interface object we are not able to access that variable
-			//so we have created the last as the object of the implemented class and solve the proble by casting 
+			//so we have created the last as the object of the implemented class and solve the problem by casting 
 		    	
 		      last.next = (se.kth.tracedata.jvm.Step) step;
 				
