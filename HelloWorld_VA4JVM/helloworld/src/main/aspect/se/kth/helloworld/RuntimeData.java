@@ -36,35 +36,40 @@ public class RuntimeData {
 	// constructor is private to make this class cannot instantiate from outside
 	static  private  RuntimeData instance = null;
 	String app="Visualization";
-	String cname= null;
-	String mname = null;
-	String sig= null;
-	int lastLockRef = 1;
-	String fname= null;
-	String fcname = null;
-	LinkedList<Transition> stack=new LinkedList<Transition>();
-	boolean isMethodSync = true;
-	ClassInfo ci ;
-	MethodInfo mi ;
+	static String cname= null;
+	static String mname = null;
+	static String sig= null;
+	static int lastLockRef = 1;
+	static String fname= null;
+	static String fcname = null;
+	static LinkedList<Transition> stack=new LinkedList<Transition>();
+	static boolean isMethodSync = true;
+	static ClassInfo ci ;
+	static MethodInfo mi ;
+	static int prevThreadId = 0;
 	
-	ChoiceGenerator<ThreadInfo> cg;
-	String cgState;
+	static ChoiceGenerator<ThreadInfo> cg;
+	static String cgState;
 	//ChoiceGenerator<ThreadInfo> cg1 = new ThreadChoiceFromSet("ROOT", false);
-	Transition tr ;
-	Instruction insn;
-	Step step;
-	long threadId;
-	String tStateName= null;
-	String threadName= null;
-	String sourceString;
-	String sourceLocation;
-	int locationNo=0;
-	String lastlockName= "App";
-	ThreadInfo thread;
+	static Transition tr ;
+	static Instruction insn;
+	static Step step;
+	static long threadId;
+	static String tStateName= null;
+	static String threadName= null;
+	static String sourceString;
+	static String sourceLocation;
+	static int locationNo=0;
+	static String lastlockName= "App";
+	static ThreadInfo thread;
+	static long prevThread= Thread.currentThread().getId();
+	static Thread eventThread=null;
 	//= new	se.kth.tracedata.jvm.ThreadInfo(0, "ROOT", "main",lastLockRef,lastlockName);
 
-	int i =0;
-
+	static int i =0;
+	static boolean threadChange = false;
+	static int firstcheck = 0;
+	
 	
 	private  RuntimeData()
 	{
@@ -82,37 +87,38 @@ public class RuntimeData {
 	}
 	static void createInvokeInstruction()
 	{	
-		
 		//System.out.println("Value od i : "+i);
-		instance.ci=new se.kth.tracedata.jvm.ClassInfo(instance.cname);
-		instance.mi= new se.kth.tracedata.jvm.MethodInfo(instance.ci,instance.mname,instance.sig);
-		if(instance.i == 0 || instance.mname == "start")
+		ci=new se.kth.tracedata.jvm.ClassInfo(cname);
+		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig);
+		if(i == 0 || mname == "start")
 		{
-			instance.cg= updateChoiceGenerator(instance.mname,instance.i);
+			cg= updateChoiceGenerator(mname,i);
 		}
-		instance.i++;
+		i++;
 		
 		
-		
-		long currentThread = Thread.currentThread().getId();
 		
 		//code to get the particular line source code
 		   try
 			{
 			   // get path of current directory System.out.println(new File(".").getAbsoluteFile());
 			   //For maven 
-			   instance.sourceString = Files.readAllLines(Paths.get("./helloworld/src/main/java/se/kth/helloworld/App.java")).get(instance.locationNo-1);
+			   	sourceString = Files.readAllLines(Paths.get("./helloworld/src/main/java/se/kth/helloworld/App.java")).get(locationNo-1);
 			   //For eclipse 
-			   //instance.sourceString = (Files.readAllLines(Paths.get("./src/main/java/se/kth/helloworld/App.java")).get(instance.locationNo-1)).trim();
+			   	//sourceString = (Files.readAllLines(Paths.get("./src/main/java/se/kth/helloworld/App.java")).get(locationNo - 1)).trim();
 			   
 				
 			}
 			catch (Exception e) {
 				e.printStackTrace();
 			}
-		instance.insn = new JVMInvokeInstruction(instance.cname,instance.mname,instance.sourceString);
-		instance.insn.setMethodInfo(instance.mi);
-		addPreviousStep(instance.cg);
+			
+			
+		
+		insn = new JVMInvokeInstruction(cname,mname,sourceString);
+		insn.setMethodInfo(mi);
+		addPreviousStep(cg);
+		
 	
 		
 		
@@ -121,86 +127,99 @@ public class RuntimeData {
 	static void createFieldInstruction()
 	{
 		
-		
-		instance.insn = new FieldInstruction(instance.fname,instance.cname);
-		instance.insn.setMethodInfo(instance.mi);
-		if(instance.i == 0 || instance.mname == "start")
+		insn = new FieldInstruction(fname,cname);
+		insn.setMethodInfo(mi);
+		if(i == 0 || mname == "start")
 		{
-			instance.cg= updateChoiceGenerator(instance.mname,instance.i);
+			cg= updateChoiceGenerator(mname,i);
 		}
-		instance.i++;
-		addPreviousStep(instance.cg);
+		i++;
+		addPreviousStep(cg);
 		
 		
 	}
 	
 	static void addPreviousStep(ChoiceGenerator<ThreadInfo> cg) {
 		long currentThreadId = Thread.currentThread().getId();
-		long id = instance.threadId;
+		if(firstcheck == 0)
+		{
+			prevThread= currentThreadId;
+			firstcheck++;
+		}
 		
-	 if ((instance.tr == null) || (currentThreadId != instance.threadId))
+		//System.out.println("Method Name "+ mname+" ThreadId Name "+ threadId+"  Location "+ sourceString+"  Current threadId  "+prevThread+" \n");
+		
+		long id = threadId;
+		
+	 if ((tr == null) || (prevThread != threadId))
 	 {
+		 
+		 if( tr != null)
+		   {
+			 tr =addPreviousTr(tr); 
+			 threadChange = true;  
+			 prevThread = threadId;
+		   }
+		 
+		 thread = updateThreadInfo();
+		  //thread = new se.kth.tracedata.jvm.ThreadInfo(threadId, tStateName,threadName,lastLockRef,lastlockName);
 		
-		 instance.thread = updateThreadInfo();
-		  //instance.thread = new se.kth.tracedata.jvm.ThreadInfo(instance.threadId, instance.tStateName,instance.threadName,instance.lastLockRef,instance.lastlockName);
-		instance.threadId = id;
-	
-		
-		instance.tr = new se.kth.tracedata.jvm.Transition(cg,instance.thread);
+		tr = new se.kth.tracedata.jvm.Transition(cg,thread);
+   
 	 }
-		   assert(instance.insn != null);
-		   
-		   instance.step = new se.kth.tracedata.jvm.Step(instance.insn,instance.sourceString,instance.sourceLocation);
-		   (instance.tr).addStep(instance.step);
-		 if((currentThreadId != instance.threadId) )
-		 {
-		  
-			  addPreviousTr(instance.tr); 
-		 }
-		 else if (instance.stack.size() <= 0 && java.lang.Thread.activeCount() == 1)
-		 {
-			 addPreviousTr(instance.tr); 
-		 }
-		   
-			 
-		   
+	
+	 assert(insn != null);
+	 step = new se.kth.tracedata.jvm.Step(insn,sourceString,sourceLocation);
+	 (tr).addStep(step); 
+	 //System.out.println("Thread count"+java.lang.Thread.activeCount());
+	 //System.out.println("Thread changee"+threadChange);
+	
 		   
 	}
-	static void addPreviousTr(Transition tr) {
+	static Transition addPreviousTr(Transition tr) {
 		   assert (tr != null);
-		   instance.stack.add(tr);
+		   
+		   stack.add(tr);
 		   tr = new se.kth.tracedata.jvm.Transition(null,null); // reset transition record
+		   prevThreadId=0;
+		   return tr;
 		}
 	static ThreadInfo updateThreadInfo()
 	{
 		long currentThreadId = Thread.currentThread().getId();
 		 
-		 instance.threadId = Thread.currentThread().getId();
-		 instance.threadName = Thread.currentThread().getName();
-		 instance.tStateName = Thread.currentThread().getState().toString();
-		 instance.threadName = instance.threadName.substring(instance.threadName.lastIndexOf('.') + 1);
-		 instance.thread = new	se.kth.tracedata.jvm.ThreadInfo(instance.threadId, instance.tStateName, instance.threadName,instance.lastLockRef,instance.lastlockName);
-		return (instance.thread);
+		 threadId = eventThread.getId();
+		 threadName = eventThread.getName();
+		 tStateName = eventThread.getState().toString();
+		 threadName = threadName.substring(threadName.lastIndexOf('.') + 1);
+		 thread = new	se.kth.tracedata.jvm.ThreadInfo(threadId, tStateName, threadName,lastLockRef,lastlockName);
+		return (thread);
 	}
 	static ChoiceGenerator<ThreadInfo> updateChoiceGenerator(String methodName, int i)
 	{
 		long threadId = Thread.currentThread().getId();
 		if(i==0 ) {
-			instance.cg = new ThreadChoiceFromSet("ROOT", false,threadId); 
+			cg = new ThreadChoiceFromSet("ROOT", false,threadId); 
 			
 		}
 		else if(methodName == "start") {
 					
-			instance.cg = new ThreadChoiceFromSet("START", false,threadId); 		
+			cg = new ThreadChoiceFromSet("START", false,threadId); 		
 		}
-		return instance.cg;
+		return cg;
+	}
+	static void singleThreadProg()
+	{
+		if(stack.size() == 0 && !threadChange )
+		 {
+			 addPreviousTr(tr); 
+		 }
 	}
 	
 	
 	
-public void displayErrorTrace() {
-		
-		
+public void displayErrorTrace() {	
+		singleThreadProg();
 		se.kth.jpf_visual.ErrorTracePanel gui = new se.kth.jpf_visual.ErrorTracePanel();
 			Path p= new se.kth.tracedata.jvm.Path(app,stack);
 			gui.drowJVMErrTrace(p, true);
@@ -220,4 +239,3 @@ if ((currentTransition == null) || (currentThread != thread)) {
 thread = currentThread;
 return currentTransition;
 }*/
-
