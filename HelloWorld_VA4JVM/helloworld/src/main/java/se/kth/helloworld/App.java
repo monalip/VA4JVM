@@ -18,13 +18,21 @@ public class App
 	
 	public static void main( String[] args )
     {
-		App app = new App();
-		int result;
-        result = add(a, b);
-        MyThread t = new MyThread();
-        t.start();
-        
        
+        
+		
+		App app = new App();
+		System.out.println("App values: "+app.a);
+		int r = add(2,3);
+		MyThread t = new MyThread();
+		t.start();
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.print("Finish");
        
     }
 
@@ -45,15 +53,21 @@ class MyThread extends Thread
 	public void run()
 	{
 		int m,n,r;
-		m = 1;
+		m = 4;
 		n = 2;
 		r = threadadd(m,n);
+		r = threadsub(m,n);
 		System.out.println("ChildThread "+r);
 		
 		
 	}
 	 private int threadadd(int m, int n) {
 			return m + n;
+			
+			
+		}
+	 private int threadsub(int m, int n) {
+			return m - n;
 			
 			
 		}
