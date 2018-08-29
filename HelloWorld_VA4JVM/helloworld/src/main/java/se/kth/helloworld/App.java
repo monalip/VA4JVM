@@ -19,8 +19,6 @@ public class App
 	public static void main( String[] args )
     {
        
-        
-		
 		App app = new App();
 		System.out.println("App values: "+app.a);
 		int r = add(2,3);

@@ -203,7 +203,6 @@ public class ErrorTracePanel extends JPanel{
 		if (found && path != null) 
 		{
 			drowErrTrace(path,found);
-			
 		    frame.getContentPane().add(tablePanel, BorderLayout.CENTER);
 		    //frame.pack();
 		    frame.setVisible(true);
