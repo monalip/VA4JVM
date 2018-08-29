@@ -1,5 +1,6 @@
 package se.kth.helloworld;
 
+import java.awt.print.PrinterException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +22,7 @@ aspect HelloAspect {
 	static Thread threadaspectj= null;
 	
 	private static boolean DEBUG = false;
-  /*  before() :
+    /*before() :
         if(!DEBUG) && (
             call(* Thread+.start()) ||
             call(* ExecutorService+.execute(..)) ||
@@ -31,7 +32,7 @@ aspect HelloAspect {
             call(* ScheduledExecutorService.scheduleAtFixedRate(..))
         )
     {
-        System.out.println("First:   "+thisJoinPoint);
+        System.out.println("First:   "+Thread.currentThread());
     }
 
     before() :
@@ -48,6 +49,12 @@ aspect HelloAspect {
 	 * 
 	 * thread inforamtion
 	 * */
+	after(Thread childThread) : call(* Thread+.start()) && !within(HelloAspect) && target(childThread)
+	{
+		//log.log(Level.INFO, "pointcut:" + thisJoinPoint.getKind()+" Trace method ThreadId "+ childThread.getName()+" \n");
+		global.threads.add(childThread);
+		
+	}
 	/*after(Thread childThread) : call(public void java.lang.Thread.start()) && !within(HelloAspect) && target(childThread)
 	{
 		//System.out.println("Thread inforamtion");
@@ -95,7 +102,7 @@ aspect HelloAspect {
 			global.createInvokeInstruction();
 	}*/
 	//pointcut traceMethod(): (execution (* *.*(..)) || execution(*.new(..)) || initialization(*.new(..)) || call(void java.io.PrintStream.println(..)) || call(public void java.lang.Thread.start()))   && !cflow(within(HelloAspect)) ;
-	pointcut traceMethod(): (execution (* *.*(..)) || execution(*.new(..)) || initialization(*.new(..)) || call(* println(..)) || call(* Thread+.start()) || call(* Thread+.join()) || call(* java..*.*(..)))   && !cflow(within(HelloAspect)) ;
+	pointcut traceMethod(): (execution (* *.*(..)) || (execution(*.new(..))) || call(* println(..)) || call(* Thread+.start()) || call(* Thread+.join()) || call(* java..*.*(..)))   && !cflow(within(HelloAspect)) ;
 	//pointcut traceMethod(): (execution (* *.*(..)) || call(* Thread+.start()))   && !cflow(within(HelloAspect)) ;
 
 	after(): traceMethod() 
@@ -120,8 +127,9 @@ aspect HelloAspect {
 			String fieldName="";
 			
 			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj);
-			//log.log(Level.INFO,"Trace method methodName "+ methodName+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
+			//log.log(Level.INFO,"Trace method methodName "+ methodName+" pointcut:" + thisJoinPoint.getKind()+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
 			global.createInvokeInstruction();
+			
 		
 			
 		
@@ -178,8 +186,20 @@ aspect HelloAspect {
 	   {
 		 
 		   System.out.println("The application has ended...");
+		   for(Thread t:global.threads)
+		   {
+			  //use try catch as   t.join() throws InterruptedException if it detects that the current thread has its interrupt flag set 
+			   try {
+				   t.join();
+				
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+		   }
+		   //Start GUI
 		   global.displayErrorTrace();
-	   
+		   // clear the threadList
+		   global.threads.clear();
 	   }
 	   
 	   public void updateGlobalVar(String sign,String className,String methodName,long thread,String sourceLocation,int lineNo,String fieldName, Thread threadaspectj)
