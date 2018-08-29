@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 import java.util.Scanner;
 import java.io.File;
@@ -33,7 +35,7 @@ public class RuntimeData {
 	 * 
 	 */
 	
-	// constructor is private to make this class cannot instantiate from outside
+	
 	static  private  RuntimeData instance = null;
 	String app="Visualization";
 	static String cname= null;
@@ -69,8 +71,10 @@ public class RuntimeData {
 	static int i =0;
 	static boolean threadChange = false;
 	static int firstcheck = 0;
-	
-	
+	//create the array list
+	static Set<Thread> threads = new HashSet<Thread>();
+	static int totalTrans = 0;
+	// constructor is private to make this class cannot instantiate from outside
 	private  RuntimeData()
 	{
 		
@@ -85,9 +89,10 @@ public class RuntimeData {
 		return instance;
 		
 	}
-	static void createInvokeInstruction()
+	// we have make it synchronized so it should lock that any allow the other method should execute after fininshing that task
+	static synchronized void createInvokeInstruction()
 	{	
-		//System.out.println("Value od i : "+i);
+		//System.out.println("method : "+mname);
 		ci=new se.kth.tracedata.jvm.ClassInfo(cname);
 		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig);
 		if(i == 0 || mname == "start")
@@ -124,7 +129,7 @@ public class RuntimeData {
 		
 	}
 	
-	static void createFieldInstruction()
+	static synchronized void createFieldInstruction()
 	{
 		
 		insn = new FieldInstruction(fname,cname);
@@ -139,7 +144,7 @@ public class RuntimeData {
 		
 	}
 	
-	static void addPreviousStep(ChoiceGenerator<ThreadInfo> cg) {
+	static synchronized void addPreviousStep(ChoiceGenerator<ThreadInfo> cg) {
 		long currentThreadId = Thread.currentThread().getId();
 		if(firstcheck == 0)
 		{
@@ -165,26 +170,27 @@ public class RuntimeData {
 		  //thread = new se.kth.tracedata.jvm.ThreadInfo(threadId, tStateName,threadName,lastLockRef,lastlockName);
 		
 		tr = new se.kth.tracedata.jvm.Transition(cg,thread);
+		totalTrans++;
    
 	 }
 	
 	 assert(insn != null);
 	 step = new se.kth.tracedata.jvm.Step(insn,sourceString,sourceLocation);
-	 (tr).addStep(step); 
+	 (tr).addStep(step);	
 	 //System.out.println("Thread count"+java.lang.Thread.activeCount());
 	 //System.out.println("Thread changee"+threadChange);
 	
 		   
 	}
-	static Transition addPreviousTr(Transition tr) {
+	 static synchronized Transition addPreviousTr(Transition tr) {
 		   assert (tr != null);
-		   
+		   //System.out.println("Transition added"+tr.getOutput());
 		   stack.add(tr);
 		   tr = new se.kth.tracedata.jvm.Transition(null,null); // reset transition record
 		   prevThreadId=0;
 		   return tr;
 		}
-	static ThreadInfo updateThreadInfo()
+	 static synchronized ThreadInfo updateThreadInfo()
 	{
 		long currentThreadId = Thread.currentThread().getId();
 		 
@@ -195,7 +201,7 @@ public class RuntimeData {
 		 thread = new	se.kth.tracedata.jvm.ThreadInfo(threadId, tStateName, threadName,lastLockRef,lastlockName);
 		return (thread);
 	}
-	static ChoiceGenerator<ThreadInfo> updateChoiceGenerator(String methodName, int i)
+	 static synchronized ChoiceGenerator<ThreadInfo> updateChoiceGenerator(String methodName, int i)
 	{
 		long threadId = Thread.currentThread().getId();
 		if(i==0 ) {
@@ -208,18 +214,26 @@ public class RuntimeData {
 		}
 		return cg;
 	}
-	static void singleThreadProg()
+	 static synchronized void singleThreadProg()
 	{
 		if(stack.size() == 0 && !threadChange )
 		 {
 			 addPreviousTr(tr); 
 		 }
 	}
+	 static synchronized void addLastTransition()
+		{
+			if(totalTrans > stack.size() )
+			 {
+				 addPreviousTr(tr); 
+			 }
+		}
 	
 	
 	
-public void displayErrorTrace() {	
+public synchronized void displayErrorTrace() {	
 		singleThreadProg();
+		addLastTransition();
 		se.kth.jpf_visual.ErrorTracePanel gui = new se.kth.jpf_visual.ErrorTracePanel();
 			Path p= new se.kth.tracedata.jvm.Path(app,stack);
 			gui.drowJVMErrTrace(p, true);
