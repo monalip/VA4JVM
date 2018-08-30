@@ -3,6 +3,7 @@ package se.kth.jpf_visual;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.layout.mxStackLayout;
@@ -20,11 +21,13 @@ public class MenuPane {
 	private int numOfThreads = -1;
 	private Object menuParent;
 	private List<String> threadNames;
-
-	public MenuPane(double width, List<String> tName) {
+	private List<Integer> threadId = null;
+//Change the constructor of the MenuPane to get the list of threadId
+	public MenuPane(double width, List<String> tName, List<Integer> threadId) {
 		this.cellWidth = width;
 		this.threadNames = tName;
 		this.numOfThreads = threadNames.size();
+		this.threadId = threadId;
 
 		graph = new mxGraph();
 		menuModel = graph.getModel();
@@ -86,13 +89,15 @@ public class MenuPane {
 			mxCell tranCell = (mxCell) graph.insertVertex(menu, null, "Trans.", 0, 0, PaneConstants.RANGE_SIZE,
 					PaneConstants.CELL_HEIGHT, "menu");
 			tranCell.setConnectable(false);
-
+			
 			for (int i = 0; i < numOfThreads; i++) {
 				double cw = cellWidth;
 				if (i == 0) {
 					cw = cellWidth + PaneConstants.SIGN_SIZE;
 				}
-				((mxCell) graph.insertVertex(menu, null, threadNames.get(i) + "\n" + i, 0, 0, cw,
+				// As the thread Id is not start from 0 in our case hence putting the values of threadId based on the index of i in not a
+				//valid option in our case hence we are taking the threaId from the list of threadId
+				((mxCell) graph.insertVertex(menu, null, threadNames.get(i) + "\n" + threadId.get(i), 0, 0, cw,
 						PaneConstants.CELL_HEIGHT, "menu")).setConnectable(false);
 
 			}
