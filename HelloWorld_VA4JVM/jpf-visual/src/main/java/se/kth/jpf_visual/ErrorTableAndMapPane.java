@@ -12,6 +12,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,6 +59,7 @@ public class ErrorTableAndMapPane extends JPanel implements ComponentListener {
 	private JSplitPane splitPane;
 	private JSplitPane mapPane;
 	private JPanel buttonPanel;
+	private List<Integer> threadId = null;
 
 	double cellWidth = -1;
 
@@ -68,6 +71,7 @@ public class ErrorTableAndMapPane extends JPanel implements ComponentListener {
 	private List<Double> threadHeightList;
 
 	public ErrorTableAndMapPane() {
+		threadId = new ArrayList<>();
 		this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		graphComponent = new mxGraphComponent(new mxGraph());
 		graphComponent.getGraphHandler().setRemoveCellsFromParent(false);
@@ -112,11 +116,13 @@ public class ErrorTableAndMapPane extends JPanel implements ComponentListener {
 		threadNames = td.getThreadNames();
 		lineTable = td.getLineTable();
 		threadStateMap = td.getThreadStateMap();
+		threadId = td.getThreadIds();
+		
 
 		// the main table
 		cellWidth = (splitPane.getLeftComponent().getBounds().getWidth() - PaneConstants.RANGE_SIZE
 				- PaneConstants.SIGN_SIZE - PaneConstants.BAR_SIZE) / numOfThreads;
-		content = new ContentPane(cellWidth, numOfThreads, path, group, lineTable, location);
+		content = new ContentPane(cellWidth, numOfThreads, path, group, lineTable, location,threadId);
 		content.resize(cellWidth);
 
 		double rightCellWidth = (splitPane.getWidth() - splitPane.getLeftComponent().getBounds().getWidth()
@@ -143,7 +149,7 @@ public class ErrorTableAndMapPane extends JPanel implements ComponentListener {
 
 		// set menu
 	
-		menu = new MenuPane(cellWidth, threadNames);
+		menu = new MenuPane(cellWidth, threadNames,threadId);
 		mxGraph menuGraph = menu.getGraph();
 		menuGraphComponent.setGraph(menuGraph);
 		menuGraphComponent.getGraphHandler().setRemoveCellsFromParent(false);
