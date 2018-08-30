@@ -186,6 +186,7 @@ aspect HelloAspect {
 	   {
 		 
 		   System.out.println("The application has ended...");
+		   
 		   for(Thread t:global.threads)
 		   {
 			  //use try catch as   t.join() throws InterruptedException if it detects that the current thread has its interrupt flag set 
