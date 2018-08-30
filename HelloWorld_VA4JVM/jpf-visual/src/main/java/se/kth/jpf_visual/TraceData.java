@@ -37,7 +37,7 @@ public class TraceData {
 
 	private Path path;
 	
-	private Set<Integer> threadId = new HashSet<>();
+	private List<Integer> threadId = null;
 	
 
 	private List<Pair<Integer, Integer>> group = new ArrayList<>();
@@ -60,6 +60,7 @@ public class TraceData {
 		group = new ArrayList<>();
 		threadNames = new ArrayList<>();
 		numOfThreads = -1;
+		threadId = new ArrayList<>();
 		if (path.size() == 0) {
 			return; // nothing to publish
 		}
@@ -108,7 +109,9 @@ public class TraceData {
 			currTran++;
 			numOfThreads = Math.max(numOfThreads, currThread);
 		}
-		numOfThreads++;
+		//numOfThreads++;
+		numOfThreads=threadId.size();
+		
 	}
 
 	private void secondPass() {
@@ -671,6 +674,10 @@ public class TraceData {
 
 	public Path getPath() {
 		return this.path;
+	}
+	public List<Integer> getThreadIds()
+	{
+		return this.threadId;
 	}
 
 	public List<Pair<Integer, Integer>> getGroup() {
