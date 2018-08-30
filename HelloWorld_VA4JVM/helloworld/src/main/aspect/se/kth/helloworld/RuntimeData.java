@@ -221,6 +221,10 @@ public class RuntimeData {
 			 addPreviousTr(tr); 
 		 }
 	}
+	 /*
+	  * 
+	  * add the Last transition If it is not added into the stack
+	  */
 	 static synchronized void addLastTransition()
 		{
 			if(totalTrans > stack.size() )
