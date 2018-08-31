@@ -45,6 +45,12 @@ public class ThreadChoiceFromSet implements se.kth.tracedata.ThreadChoiceFromSet
 		
 		return threadId;
 	}
+	@Override
+	//setting the id based on the method name call start join
+	public void setId(String newid)
+	{
+		id = newid;
+	}
 	
 
 	

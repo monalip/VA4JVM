@@ -129,11 +129,7 @@ aspect HelloAspect {
 			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj);
 			//log.log(Level.INFO,"Trace method methodName "+ methodName+" pointcut:" + thisJoinPoint.getKind()+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
 			global.createInvokeInstruction();
-			
 		
-			
-		
-			
 	}
 	
 	/**
@@ -189,7 +185,8 @@ aspect HelloAspect {
 		   
 		   for(Thread t:global.threads)
 		   {
-			  //use try catch as   t.join() throws InterruptedException if it detects that the current thread has its interrupt flag set 
+			  //use try catch as   t.join() throws InterruptedException if it detects that the current thread has its interrupt flag set
+			   //main thread is entered in the waiting state until other thread completes its execution.
 			   try {
 				   t.join();
 				

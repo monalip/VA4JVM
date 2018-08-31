@@ -47,6 +47,13 @@ public class ChoiceGenerator<T> implements se.kth.tracedata.ChoiceGenerator<T> {
 		}
 		 return threadlist; 
 	}
+	@Override
+	//setting the id based on the method name call start join
+	public void setId(String newid)
+	{
+		
+	}
+	
 
 
 }

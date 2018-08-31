@@ -23,6 +23,7 @@ public class App
 		System.out.println("App values: "+app.a);
 		int r = add(2,3);
 		MyThread t = new MyThread();
+		
 		t.start();
 		try {
 			t.join();

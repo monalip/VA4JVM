@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
@@ -50,7 +52,7 @@ public class RuntimeData {
 	static MethodInfo mi ;
 	static int prevThreadId = 0;
 	
-	static ChoiceGenerator<ThreadInfo> cg;
+	static ChoiceGenerator<ThreadInfo> cg=null;
 	static String cgState;
 	//ChoiceGenerator<ThreadInfo> cg1 = new ThreadChoiceFromSet("ROOT", false);
 	static Transition tr ;
@@ -97,6 +99,7 @@ public class RuntimeData {
 		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig);
 		if(i == 0 || mname == "start")
 		{
+			
 			cg= updateChoiceGenerator(mname,i);
 		}
 		i++;
@@ -134,7 +137,7 @@ public class RuntimeData {
 		
 		insn = new FieldInstruction(fname,cname);
 		insn.setMethodInfo(mi);
-		if(i == 0 || mname == "start")
+		if(mname == "start")
 		{
 			cg= updateChoiceGenerator(mname,i);
 		}
@@ -161,7 +164,7 @@ public class RuntimeData {
 		 
 		 if( tr != null)
 		   {
-			 tr =addPreviousTr(tr); 
+			 addPreviousTr(tr); 
 			 threadChange = true;  
 			 prevThread = threadId;
 		   }
@@ -182,13 +185,13 @@ public class RuntimeData {
 	
 		   
 	}
-	 static synchronized Transition addPreviousTr(Transition tr) {
+	 static synchronized void addPreviousTr(Transition tr) {
 		   assert (tr != null);
 		   //System.out.println("Transition added"+tr.getOutput());
 		   stack.add(tr);
 		   tr = new se.kth.tracedata.jvm.Transition(null,null); // reset transition record
 		   prevThreadId=0;
-		   return tr;
+		   
 		}
 	 static synchronized ThreadInfo updateThreadInfo()
 	{
@@ -203,7 +206,7 @@ public class RuntimeData {
 	}
 	 static synchronized ChoiceGenerator<ThreadInfo> updateChoiceGenerator(String methodName, int i)
 	{
-		long threadId = Thread.currentThread().getId();
+		//long threadId = Thread.currentThread().getId();
 		if(i==0 ) {
 			cg = new ThreadChoiceFromSet("ROOT", false,threadId); 
 			
@@ -232,18 +235,33 @@ public class RuntimeData {
 				 addPreviousTr(tr); 
 			 }
 		}
-	
+	 
 	
 	
 public synchronized void displayErrorTrace() {	
 		singleThreadProg();
 		addLastTransition();
+		//Sort the stack based on the transition threadId to get group of same transion inthe main pannel
+		Collections.sort(stack, new SortStack());
 		se.kth.jpf_visual.ErrorTracePanel gui = new se.kth.jpf_visual.ErrorTracePanel();
 			Path p= new se.kth.tracedata.jvm.Path(app,stack);
-			gui.drowJVMErrTrace(p, true);
+				gui.drowJVMErrTrace(p, true);
+		
 		 }
 	
 
+}
+//Group the transition based on threadId with the help of sorted stack using Collections.sort() method
+class SortStack implements Comparator<Transition>{
+	 
+    @Override
+    public int compare(Transition t1, Transition t2) {
+        if(t1.getThreadInfo().getId() > t2.getThreadInfo().getId()){
+            return 1;
+        } else {
+            return -1;
+        }
+    }
 }
 
 /** Check if the current transition is still correct; if there was a thread

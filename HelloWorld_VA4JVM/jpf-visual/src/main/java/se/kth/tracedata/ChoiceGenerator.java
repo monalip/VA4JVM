@@ -9,6 +9,7 @@ public interface ChoiceGenerator<T> {
 	 boolean isInstaceofThreadChoiceFromSet();
 	 public ThreadInfo getChoice (int idx);
 	 public ThreadInfo[] getChoices();
+	 public void setId(String id);
 		  
 
 }

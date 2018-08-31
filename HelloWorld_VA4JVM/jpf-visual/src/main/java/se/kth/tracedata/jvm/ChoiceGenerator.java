@@ -39,4 +39,10 @@ public class ChoiceGenerator implements se.kth.tracedata.ChoiceGenerator<ThreadI
 		return null;
 	}
 
+	@Override
+	public void setId(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
