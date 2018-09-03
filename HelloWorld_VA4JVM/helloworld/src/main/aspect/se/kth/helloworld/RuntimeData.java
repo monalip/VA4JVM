@@ -76,6 +76,7 @@ public class RuntimeData {
 	//create the array list
 	static Set<Thread> threads = new HashSet<Thread>();
 	static int totalTrans = 0;
+	static boolean isSync =false;
 	// constructor is private to make this class cannot instantiate from outside
 	private  RuntimeData()
 	{
@@ -94,60 +95,71 @@ public class RuntimeData {
 	// we have make it synchronized so it should lock that any allow the other method should execute after fininshing that task
 	static synchronized void createInvokeInstruction()
 	{	
-		//System.out.println("method : "+mname);
+					
+			
+			
+			ci=new se.kth.tracedata.jvm.ClassInfo(cname);
+			mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,isSync);
+			if(i == 0 || mname == "start"|| mname == "join" )
+			{
+				
+				cg= updateChoiceGenerator(mname,i);
+			}
+			i++;
+			
+				
+			getSourceString();
+			
+			   
+			
+			insn = new JVMInvokeInstruction(cname,mname,sourceString);
+			insn.setMethodInfo(mi);
+			
+			addPreviousStep(cg);	
+		
+		
+	}
+	static synchronized void createVirtualInvocationIns()
+	{
 		ci=new se.kth.tracedata.jvm.ClassInfo(cname);
-		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig);
-		if(i == 0 || mname == "start")
+		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,isSync);
+		if(i == 0 || mname == "wait")
 		{
 			
 			cg= updateChoiceGenerator(mname,i);
 		}
 		i++;
 		
-		
-		
-		//code to get the particular line source code
-		   try
-			{
-			   // get path of current directory System.out.println(new File(".").getAbsoluteFile());
-			   //For maven 
-			   	sourceString = Files.readAllLines(Paths.get("./helloworld/src/main/java/se/kth/helloworld/App.java")).get(locationNo-1);
-			   //For eclipse 
-			   	//sourceString = (Files.readAllLines(Paths.get("./src/main/java/se/kth/helloworld/App.java")).get(locationNo - 1)).trim();
-			   
-				
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
 			
-			
+		getSourceString();
 		
-		insn = new JVMInvokeInstruction(cname,mname,sourceString);
+		   
+		
+		insn = new VirtualInvocation(cname,mname,sourceString);
 		insn.setMethodInfo(mi);
-		addPreviousStep(cg);
 		
+		addPreviousStep(cg);	
 	
-		
-		
 	}
 	
 	static synchronized void createFieldInstruction()
 	{
 		
-		insn = new FieldInstruction(fname,cname);
-		insn.setMethodInfo(mi);
-		if(mname == "start")
-		{
-			cg= updateChoiceGenerator(mname,i);
-		}
-		i++;
-		addPreviousStep(cg);
+			insn = new FieldInstruction(fname,cname);
+			insn.setMethodInfo(mi);
+			if(i ==0 || mname == "start" || mname == "join" ||  mname == "wait")
+			{
+				cg= updateChoiceGenerator(mname,i);
+			}
+			i++;
+			addPreviousStep(cg);
+		
 		
 		
 	}
 	
 	static synchronized void addPreviousStep(ChoiceGenerator<ThreadInfo> cg) {
+		
 		long currentThreadId = Thread.currentThread().getId();
 		if(firstcheck == 0)
 		{
@@ -174,9 +186,8 @@ public class RuntimeData {
 		
 		tr = new se.kth.tracedata.jvm.Transition(cg,thread);
 		totalTrans++;
-   
 	 }
-	
+	 
 	 assert(insn != null);
 	 step = new se.kth.tracedata.jvm.Step(insn,sourceString,sourceLocation);
 	 (tr).addStep(step);	
@@ -188,11 +199,31 @@ public class RuntimeData {
 	 static synchronized void addPreviousTr(Transition tr) {
 		   assert (tr != null);
 		   //System.out.println("Transition added"+tr.getOutput());
+		   
 		   stack.add(tr);
+		  
 		   tr = new se.kth.tracedata.jvm.Transition(null,null); // reset transition record
 		   prevThreadId=0;
 		   
 		}
+	 static synchronized void getSourceString()
+	 {
+		//code to get the particular line source code
+		   try
+			{
+			   // get path of current directory System.out.println(new File(".").getAbsoluteFile());
+			   //For maven 
+			   	sourceString = Files.readAllLines(Paths.get("./helloworld/src/main/java/se/kth/helloworld/App.java")).get(locationNo-1);
+			   //For eclipse 
+			   	//sourceString = (Files.readAllLines(Paths.get("./src/main/java/se/kth/helloworld/App.java")).get(locationNo - 1)).trim();
+			   
+				
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+	 }
 	 static synchronized ThreadInfo updateThreadInfo()
 	{
 		long currentThreadId = Thread.currentThread().getId();
@@ -206,14 +237,23 @@ public class RuntimeData {
 	}
 	 static synchronized ChoiceGenerator<ThreadInfo> updateChoiceGenerator(String methodName, int i)
 	{
+		 
 		//long threadId = Thread.currentThread().getId();
 		if(i==0 ) {
-			cg = new ThreadChoiceFromSet("ROOT", false,threadId); 
+			cg = new ThreadChoiceFromSet("ROOT", false,threadId,0); 
 			
 		}
 		else if(methodName == "start") {
 					
-			cg = new ThreadChoiceFromSet("START", false,threadId); 		
+			cg = new ThreadChoiceFromSet("START", false,threadId,1); 		
+		}
+		else if(methodName == "join") {
+			
+			cg = new ThreadChoiceFromSet("JOIN", false,threadId,2); 		
+		}
+		else if(methodName == "wait") {
+			
+			cg = new ThreadChoiceFromSet("WAIT", false,threadId,2); 		
 		}
 		return cg;
 	}
@@ -238,11 +278,13 @@ public class RuntimeData {
 	 
 	
 	
-public synchronized void displayErrorTrace() {	
+public void displayErrorTrace() {	
 		singleThreadProg();
 		addLastTransition();
 		//Sort the stack based on the transition threadId to get group of same transion inthe main pannel
+		Collections.sort(stack, new SortStackPriority());
 		Collections.sort(stack, new SortStack());
+		
 		se.kth.jpf_visual.ErrorTracePanel gui = new se.kth.jpf_visual.ErrorTracePanel();
 			Path p= new se.kth.tracedata.jvm.Path(app,stack);
 				gui.drowJVMErrTrace(p, true);
@@ -256,13 +298,27 @@ class SortStack implements Comparator<Transition>{
 	 
     @Override
     public int compare(Transition t1, Transition t2) {
-        if(t1.getThreadInfo().getId() > t2.getThreadInfo().getId()){
+    	
+        if((t1.getThreadInfo().getId() > t2.getThreadInfo().getId())){
             return 1;
         } else {
             return -1;
         }
     }
 }
+//sorted based on the choicegenerator threadId priority
+class SortStackPriority implements Comparator<Transition>{
+	 
+    @Override
+    public int compare(Transition t1, Transition t2) {
+        if(t1.getChoiceGenerator().getIdPriority() <= t2.getChoiceGenerator().getIdPriority()){
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+}
+
 
 /** Check if the current transition is still correct; if there was a thread
 	switch since the last event, create a new transition. 
