@@ -3,6 +3,8 @@ package se.kth.helloworld;
 import java.awt.print.PrinterException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.concurrent.locks.ReentrantLock;
+
 
 
 
@@ -22,6 +24,32 @@ aspect HelloAspect {
 	static Thread threadaspectj= null;
 	
 	private static boolean DEBUG = false;
+	/**
+	 * 
+	 * Lock unlock
+	 */
+	/*pointcut lock(ReentrantLock l) : call(* ReentrantLock.lock()) && target(l) ;
+	after(Object app): lock() && args(app) {
+
+		System.out.println("around(App) lock: advice running at "+thisJoinPoint.getSourceLocation());
+
+	
+	private static final Object lock = new Object();
+
+    pointcut syncJointPoint(): execution( Synchronizes * *.*(..)); // or call()}*/
+
+    /*Object around(): syncJointPoint() {
+        synchronized(lock) {
+        	System.out.println("around(App) lock: advice running at "+thisJoinPoint.getSourceLocation());
+
+            return proceed();
+        }
+    }
+    after(Object lock):execution( Synchronizes * *.*(..)) && !within(HelloAspect) && target(lock)
+    {
+    	System.out.println("around(App) lock: advice running at "+thisJoinPoint.getSourceLocation());
+
+    }*/
     /*before() :
         if(!DEBUG) && (
             call(* Thread+.start()) ||
@@ -45,6 +73,11 @@ aspect HelloAspect {
         System.out.println("Second: " +thisJoinPoint);
     }*/
 	
+	after(Object lock):execution( synchronized* *.*(..)) && !within(HelloAspect) && target(lock)
+    {
+    	System.out.println("around(App) lock: advice running at "+thisJoinPoint.getSourceLocation());
+
+    }
 	/**
 	 * 
 	 * thread inforamtion
@@ -55,57 +88,24 @@ aspect HelloAspect {
 		global.threads.add(childThread);
 		
 	}
-	/*after(Thread childThread) : call(public void java.lang.Thread.start()) && !within(HelloAspect) && target(childThread)
+
+	pointcut lock(ReentrantLock l ): call (void ReentrantLock.lock ()) && target(l );
+	pointcut unlock(ReentrantLock l ): call (void ReentrantLock.unlock ()) && target(l );
+	before(Object l):(lock() && args(l)) || call (void ReentrantLock.lock ()) && target(l )
 	{
-		//System.out.println("Thread inforamtion");
-		//System.out.println(" Thread name: "+ childThread.getName());
-		String threadName = childThread.getName();
-		//System.out.println("Thread State:"+childThread.getState());
-		String threadState = childThread.getState().toString();
-		long mainThreadId = Thread.currentThread().getId();
-		long childthreadId = childThread.getId() ;
-		//threadLocation = thisJoinPoint.getSourceLocation();
-		/*System.out.println("Main thread : Id: " + Thread.currentThread().getId() + " Thread name: "+Thread.currentThread().getName()+" Location:" + thisJoinPoint.getSourceLocation());;
-		System.out.println("Child thread: Id: " + childThread.getId() + " Thread name: "+ childThread.getName()+" Location:" + thisJoinPoint.getSourceLocation());
-		System.out.println();
-		System.out.println();*/
-		/*global.threadId = childthreadId;
-		global.tStateName=threadState;
-		global.threadName= threadName;
-		//System.out.println(" Thread State: "+ threadState);
-		
-	}*/
-	
+		//System.out.println("Monali Pande lock: advice running at "+thisJoinPoint.getSourceLocation());
+	}
+	before(Object l):(unlock() && args(l)) || call (void ReentrantLock.unlock ()) && target(l )
+	{
+		//System.out.println("Unlock Monali Pande: advice running at "+thisJoinPoint.getSourceLocation());
+	}
 	/**
 	 * 
 	 * method inforamtion
 	 * */
-	/*pointcut traceThreadstart(): (call(* Thread+.start()) )   && !cflow(within(HelloAspect));
-	after() : traceThreadstart()
-	{
-		sign = (thisJoinPointStaticPart.getSignature()).toString();
-		locationName = sign.toString();
-		sourceString = locationName.substring(locationName.lastIndexOf('.') + 1);
-		packagename = thisJoinPoint.getSignature().getDeclaringTypeName();
-		className = packagename.substring(packagename.lastIndexOf('.') + 1);
-		methodName = thisJoinPoint.getSignature().getName();
-		sourceLocation = thisJoinPoint.getSourceLocation().toString();
-		lineNo = Integer.parseInt(sourceLocation.substring(sourceLocation.lastIndexOf(':') + 1));
-		
-			//System.out.println("sourceString "+ sourceString+" \n");
-		
-		
-		System.out.println("traceThreadstart methodName "+ methodName+" ThreadId "+ Thread.currentThread().getId()+" \n");
-		thread = Thread.currentThread().getId();
-		String fieldName="";
-			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName);
-			global.createInvokeInstruction();
-	}*/
 	//pointcut traceMethod(): (execution (* *.*(..)) || execution(*.new(..)) || initialization(*.new(..)) || call(void java.io.PrintStream.println(..)) || call(public void java.lang.Thread.start()))   && !cflow(within(HelloAspect)) ;
-	pointcut traceMethod(): (execution (* *.*(..)) || (execution(*.new(..))) || call(* println(..)) || call(* Thread+.start()) || call(* Thread+.join()) || call(* java..*.*(..)))   && !cflow(within(HelloAspect)) ;
-	//pointcut traceMethod(): (execution (* *.*(..)) || call(* Thread+.start()))   && !cflow(within(HelloAspect)) ;
-
-	after(): traceMethod() 
+	pointcut traceMethod(): (execution (* *.*(..)) || (execution(*.new(..))) || call(* Thread+.start()) || call(* Thread+.join()) || call(* java..*.*(..)) )   && !cflow(within(HelloAspect)) ;
+	before(): traceMethod() 
 	{
 		
 			
@@ -126,10 +126,32 @@ aspect HelloAspect {
 			thread = Thread.currentThread().getId();
 			String fieldName="";
 			
-			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj);
-			//log.log(Level.INFO,"Trace method methodName "+ methodName+" pointcut:" + thisJoinPoint.getKind()+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
-			global.createInvokeInstruction();
-		
+			
+			synchronized (this) {
+				if(methodName.length() > 0)
+				{
+					
+					//log.log(Level.INFO,"Trace method methodName "+ methodName+" pointcut:" + thisJoinPoint.getKind()+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
+					updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj);
+					if(methodName=="wait")
+					{
+						
+						global.createVirtualInvocationIns();
+					}
+					else if(methodName=="lock" || methodName=="unlock")
+					{
+						//System.out.println("lock: advice running at "+thisJoinPoint.getSourceLocation());
+					}
+					else
+					{
+						global.createInvokeInstruction();
+					}
+					
+				}
+				methodName ="";
+			}
+			
+			
 	}
 	
 	/**
@@ -154,18 +176,19 @@ aspect HelloAspect {
 			threadaspectj = Thread.currentThread();
 			//System.out.println("Field Name "+ className+" \n");
 			//System.out.println("ThreadId Name "+ Thread.currentThread().getId()+" \n");
-			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj);
-			//log.log(Level.INFO,"getObject fieldName "+ fieldName+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
-	
-			global.createFieldInstruction();
-		
-		
-		
-		  	
-			
-	
+			synchronized (this) {
+				if(fieldName.length()>0)
+				{
+					updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj);
+					//log.log(Level.INFO,"getObject fieldName "+ fieldName+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
+					global.createFieldInstruction();
+				}
+				
+			}
+			fieldName="";
 	
 	}
+	
 	/*
 	 * 
 	 * Instrument the end of main method before start the visualization 
@@ -181,7 +204,7 @@ aspect HelloAspect {
 	   after() : mainMethod() 
 	   {
 		 
-		   System.out.println("The application has ended...");
+		   
 		   
 		   for(Thread t:global.threads)
 		   {
@@ -194,15 +217,17 @@ aspect HelloAspect {
 				System.out.println(e);
 			}
 		   }
+		   System.out.println("The application has ended...");
 		   //Start GUI
 		   global.displayErrorTrace();
 		   // clear the threadList
 		   global.threads.clear();
 	   }
 	   
-	   public void updateGlobalVar(String sign,String className,String methodName,long thread,String sourceLocation,int lineNo,String fieldName, Thread threadaspectj)
+	   public static synchronized void updateGlobalVar(String sign,String className,String methodName,long thread,String sourceLocation,int lineNo,String fieldName, Thread threadaspectj)
 	   {
-		   global.sig= sign.toString();	
+		   
+		    global.sig= sign.toString();	
 			global.cname=className;
 			global.mname=methodName;
 			global.threadId = thread;
