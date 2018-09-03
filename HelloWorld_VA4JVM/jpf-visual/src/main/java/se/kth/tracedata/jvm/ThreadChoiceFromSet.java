@@ -6,10 +6,12 @@ public class ThreadChoiceFromSet implements se.kth.tracedata.ThreadChoiceFromSet
 	String id;
 	boolean isCascade;
 	int threadId;
-	 public ThreadChoiceFromSet(String id,boolean isCascade, long threadId) {
+	int idPriority;
+	 public ThreadChoiceFromSet(String id,boolean isCascade, long threadId, int idPriority) {
 		 this.id = id;
 		 this.isCascade = isCascade;
 		 this.threadId = (int) threadId;
+		 this.idPriority = idPriority;
 		
 	}
 
@@ -46,10 +48,10 @@ public class ThreadChoiceFromSet implements se.kth.tracedata.ThreadChoiceFromSet
 		return threadId;
 	}
 	@Override
-	//setting the id based on the method name call start join
-	public void setId(String newid)
+	//getIdpriority
+	public int getIdPriority()
 	{
-		id = newid;
+		return idPriority;
 	}
 	
 

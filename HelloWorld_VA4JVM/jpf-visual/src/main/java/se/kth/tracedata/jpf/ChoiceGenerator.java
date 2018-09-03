@@ -49,9 +49,9 @@ public class ChoiceGenerator<T> implements se.kth.tracedata.ChoiceGenerator<T> {
 	}
 	@Override
 	//setting the id based on the method name call start join
-	public void setId(String newid)
+	public int getIdPriority()
 	{
-		
+		return 0;
 	}
 	
 
