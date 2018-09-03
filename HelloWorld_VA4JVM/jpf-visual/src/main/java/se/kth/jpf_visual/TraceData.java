@@ -343,16 +343,29 @@ public class TraceData {
 	
 	private void loadWaitNotify(String line, Instruction insn, int pi, int height) {
 		if (line != null && (insn.isInstanceofVirtualInv() || insn instanceof VirtualInvocation )) {
-			String insnStr = insn.toString();
-			if (insnStr.contains("java.lang.Object.wait()") || insnStr.contains("java.lang.Object.notify()")
-					|| insnStr.contains("java.lang.Object.notifyAll()")) {
+			
+			String insnStr = null;
+			if(insn.isInstanceofVirtualInv())
+			{
+				insnStr=insn.toString();
+			}
+			else if(insn instanceof VirtualInvocation )
+			{
+				//As the instruction don't contain the information of the wait,notify directly 
+				//hence we have access that information from the signature parameter of the methodInfo
+				insnStr =insn.getMethodInfo().getUniqueName();
+				
+			}
+			if (insnStr.contains("java.lang.Object.wait(") || insnStr.contains("java.lang.Object.notify(")
+					|| insnStr.contains("java.lang.Object.notifyAll(")) {
 				waitSet.add(new Pair<>(pi, height - 1));
 			}
+			
 		}
 	}
 /*
  *  created the methods of LockInstruction inside the Instruction adapter and checking the insn is the instaceof condition using 
- *	 fuction isInstanceofLockIns. Hence methods are directly calling with the help of Instruction object.
+ *	 function isInstanceofLockIns. Hence methods are directly calling with the help of Instruction object.
  * 
  **/
 		
