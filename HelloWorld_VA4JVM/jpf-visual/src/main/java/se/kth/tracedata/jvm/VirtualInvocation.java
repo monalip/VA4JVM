@@ -6,9 +6,11 @@ public class VirtualInvocation extends se.kth.tracedata.VirtualInvocation{
 	 protected String cname;
 	  protected String mname;
 	  MethodInfo mi;
-	  public VirtualInvocation(String cname, String mname) {
+	  String sourceLocation;
+	  public VirtualInvocation(String cname, String mname,String sourceLocation) {
 		this.cname = cname;
 		this.mname = mname;
+		this.sourceLocation = sourceLocation;
 	}
 
 	@Override
@@ -31,7 +33,7 @@ public class VirtualInvocation extends se.kth.tracedata.VirtualInvocation{
 	@Override
 	public String getFileLocation() {
 		// TODO Auto-generated method stub
-		return null;
+		return sourceLocation;
 	}
 
 	@Override
