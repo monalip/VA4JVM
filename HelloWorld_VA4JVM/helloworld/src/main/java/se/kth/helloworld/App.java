@@ -1,5 +1,7 @@
 package se.kth.helloworld;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * Hello world!
  *
@@ -8,6 +10,8 @@ public class App
 {
 	static int a = 3;
 	static int b = 5;
+
+	private final ReentrantLock lock = new ReentrantLock();
 
 	
    public App()
@@ -18,15 +22,15 @@ public class App
 	
 	public static void main( String[] args )
     {
-       
+       String name = "Monali Pande";
 		App app = new App();
 		System.out.println("App values: "+app.a);
 		int r = add(2,3);
-		MyThread t = new MyThread();
-		
-		t.start();
+		MyThread t = new MyThread(name);
+		app.m();
+		new Thread(t).start();
 		try {
-			t.join();
+			new Thread(t).join();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -34,20 +38,37 @@ public class App
 		System.out.print("Finish");
        
     }
+	public void m() {
+		
+		int count = 0;
 
-	private static int add(int a2, int b2) {
+	    lock.lock();
+	    try {
+	        count++;
+	    } finally {
+	        lock.unlock();
+	    }
+	}
+
+	private static synchronized int add(int a2, int b2) {
+
+		synchronized (App.class) {
+
+			System.err.println("non-static method running");
+
+		}
 		
 		return a2+b2;
 	}
 	
 
 }
-class MyThread extends Thread
+class MyThread implements Runnable
 {	
 	public String name;
 	
-	public MyThread() {
-		this.name = "Monali";
+	public MyThread(String name) {
+		this.name = name;
 	}
 	public void run()
 	{
@@ -57,6 +78,15 @@ class MyThread extends Thread
 		r = threadadd(m,n);
 		r = threadsub(m,n);
 		System.out.println("ChildThread "+r);
+		synchronized (name) 
+		{
+            try{
+                System.out.println(name+" waiting to get notified at time:"+System.currentTimeMillis());
+                name.wait(2000);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+		}
 		
 		
 	}
