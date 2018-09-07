@@ -247,7 +247,6 @@ public class ErrorTracePanel extends JPanel{
 
 		// add monitor enter/exit and synchronized method check boxes
 		for (String s : fieldNames) {
-			System.out.println(s);
 			JCheckBox cb = new JCheckBox("(un)lock: " + s);
 			cb.setSelected(false);
 			cb.addItemListener(checkBoxListener);

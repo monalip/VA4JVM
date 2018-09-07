@@ -23,6 +23,7 @@ import se.kth.tracedata.ThreadInfo;
 import se.kth.tracedata.Transition;
 import se.kth.tracedata.VirtualInvocation;
 import se.kth.tracedata.JVMInvokeInstruction;
+import se.kth.tracedata.JVMReturnInstruction;
 
 
 
@@ -38,6 +39,7 @@ public class TraceData {
 	private Path path;
 	
 	private List<Integer> threadId = null;
+	
 	
 
 	private List<Pair<Integer, Integer>> group = new ArrayList<>();
@@ -253,6 +255,7 @@ public class TraceData {
 			if (lineTable.get(pi).getTextLine(height - 1).isSrc()) {
 				threadStartSet.add(new Pair<>(pi, height - 1));
 			}
+			
 		}
 		Pair<Integer, Integer> tmp = new Pair<>(pi, height);
 
@@ -371,6 +374,8 @@ public class TraceData {
 		
 	private void loadLockUnlock(String line, Instruction insn, MethodInfo mi, ThreadInfo ti, int pi, int height) {
 		
+		//if field is lock then i have to LockInstruction
+		
 		if (line != null && (insn.isInstanceofLockIns() || insn instanceof LockInstruction))
 		{
 			/*
@@ -407,9 +412,9 @@ public class TraceData {
 			}
 		}
 		
-		
+		//if the method is lock then I have to use JVMReturnIns
 		//checking insn instanceof JVMReturnInstruction inside method isInstanceofJVMReturnIns() inside instruction adapter
-		if (line != null && insn.isInstanceofJVMReturnIns()) {
+		if (line != null && (insn.isInstanceofJVMReturnIns() || insn instanceof JVMReturnInstruction)) {
 			String mName = mi.getFullName();
 			String cName = mi.getClassName();
 			if (lockMethodName.contains(mName)) {
