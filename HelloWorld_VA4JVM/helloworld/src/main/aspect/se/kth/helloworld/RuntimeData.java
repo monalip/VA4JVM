@@ -26,6 +26,7 @@ import se.kth.tracedata.ThreadInfo;
 import se.kth.tracedata.Transition;
 import se.kth.tracedata.jvm.FieldInstruction;
 import se.kth.tracedata.jvm.JVMInvokeInstruction;
+import se.kth.tracedata.jvm.JVMReturnInstruction;
 import se.kth.tracedata.jvm.LockInstruction;
 import se.kth.tracedata.jvm.ThreadChoiceFromSet;
 import se.kth.tracedata.jvm.VirtualInvocation;
@@ -55,7 +56,7 @@ public class RuntimeData {
 	static ChoiceGenerator<ThreadInfo> cg=null;
 	static String cgState;
 	//ChoiceGenerator<ThreadInfo> cg1 = new ThreadChoiceFromSet("ROOT", false);
-	static Transition tr ;
+	static Transition tr = null ;
 	static Instruction insn;
 	static Step step;
 	static long threadId;
@@ -64,13 +65,14 @@ public class RuntimeData {
 	static String sourceString;
 	static String sourceLocation;
 	static int locationNo=0;
-	static String lastlockName= "App";
+	static String lastlockName= null;
 	static ThreadInfo thread;
 	static long prevThread= Thread.currentThread().getId();
 	static Thread eventThread=null;
 	//= new	se.kth.tracedata.jvm.ThreadInfo(0, "ROOT", "main",lastLockRef,lastlockName);
 
 	static int i =0;
+	static boolean isFirst=true;
 	static boolean threadChange = false;
 	static int firstcheck = 0;
 	//create the array list
@@ -95,27 +97,14 @@ public class RuntimeData {
 	// we have make it synchronized so it should lock that any allow the other method should execute after fininshing that task
 	static synchronized void createInvokeInstruction()
 	{	
-					
-			
-			
 			ci=new se.kth.tracedata.jvm.ClassInfo(cname);
-			mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,isSync);
-			if(i == 0 || mname == "start"|| mname == "join" )
-			{
-				
-				cg= updateChoiceGenerator(mname,i);
-			}
-			i++;
-			
-				
+			mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,isSync);				
 			getSourceString();
-			
-			   
-			
+
 			insn = new JVMInvokeInstruction(cname,mname,sourceString);
 			insn.setMethodInfo(mi);
 			
-			addPreviousStep(cg);	
+			addPreviousStep();	
 		
 		
 	}
@@ -123,22 +112,27 @@ public class RuntimeData {
 	{
 		ci=new se.kth.tracedata.jvm.ClassInfo(cname);
 		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,isSync);
-		if(i == 0 || mname == "wait")
-		{
-			
-			cg= updateChoiceGenerator(mname,i);
-		}
-		i++;
 		
-			
 		getSourceString();
-		
-		   
-		
+
 		insn = new VirtualInvocation(cname,mname,sourceString);
 		insn.setMethodInfo(mi);
 		
-		addPreviousStep(cg);	
+		addPreviousStep();	
+	
+	}
+	static synchronized void createJVMReturnInstr()
+	{
+		
+		ci=new se.kth.tracedata.jvm.ClassInfo(cname);
+		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,isSync);
+		//System.out.println("Method Name "+mname+" IsSynch"+isSync+"\n");	
+		//insn = new LockInstruction(lastLockRef);
+		insn = new JVMReturnInstruction();
+		insn.setMethodInfo(mi);	
+		getSourceString();
+		addPreviousStep();
+		
 	
 	}
 	
@@ -147,30 +141,25 @@ public class RuntimeData {
 		
 			insn = new FieldInstruction(fname,cname);
 			insn.setMethodInfo(mi);
-			if(i ==0 || mname == "start" || mname == "join" ||  mname == "wait")
-			{
-				cg= updateChoiceGenerator(mname,i);
-			}
-			i++;
-			addPreviousStep(cg);
+			getSourceString();
+			addPreviousStep();
 		
 		
 		
 	}
 	
-	static synchronized void addPreviousStep(ChoiceGenerator<ThreadInfo> cg) {
-		
+	static synchronized void addPreviousStep() {
+			
 		long currentThreadId = Thread.currentThread().getId();
+		 cg = updateChoiceGenerator(mname);
 		if(firstcheck == 0)
 		{
 			prevThread= currentThreadId;
 			firstcheck++;
 		}
 		
-		//System.out.println("Method Name "+ mname+" ThreadId Name "+ threadId+"  Location "+ sourceString+"  Current threadId  "+prevThread+" \n");
-		
 		long id = threadId;
-		
+				
 	 if ((tr == null) || (prevThread != threadId))
 	 {
 		 
@@ -183,18 +172,28 @@ public class RuntimeData {
 		 
 		 thread = updateThreadInfo();
 		  //thread = new se.kth.tracedata.jvm.ThreadInfo(threadId, tStateName,threadName,lastLockRef,lastlockName);
-		
+			
 		tr = new se.kth.tracedata.jvm.Transition(cg,thread);
 		totalTrans++;
 	 }
-	 
-	 assert(insn != null);
-	 step = new se.kth.tracedata.jvm.Step(insn,sourceString,sourceLocation);
-	 (tr).addStep(step);	
-	 //System.out.println("Thread count"+java.lang.Thread.activeCount());
-	 //System.out.println("Thread changee"+threadChange);
+	 //Setting the cg aaccoring to diiferent Id
+		 tr.setChoiceGenerator(cg);
+	  assert(insn != null);
+	  if(mname.length() >0 || fname.length() > 0)
+	  {
+			
+		   step = new se.kth.tracedata.jvm.Step(insn,sourceString,sourceLocation);
+		   //System.out.println("Method Name "+insn.getMethodInfo().getUniqueName()+" Cg: " +cg.getId()+"Thread ID: "+threadId+"Field Name "+fname+"Source String "+sourceString+"Location No:"+locationNo+"\n");
+			
+			 (tr).addStep(step);	
+			 //System.out.println("Choice Id  "+cg.getId()+"Method Name "+mname+"\n");
+			 i++;  
+		 
+	  }
+	  isSync =false;
+	  isFirst = false;
 	
-		   
+	
 	}
 	 static synchronized void addPreviousTr(Transition tr) {
 		   assert (tr != null);
@@ -203,7 +202,7 @@ public class RuntimeData {
 		   stack.add(tr);
 		  
 		   tr = new se.kth.tracedata.jvm.Transition(null,null); // reset transition record
-		   prevThreadId=0;
+		   prevThreadId=-1;
 		   
 		}
 	 static synchronized void getSourceString()
@@ -227,7 +226,7 @@ public class RuntimeData {
 	 static synchronized ThreadInfo updateThreadInfo()
 	{
 		long currentThreadId = Thread.currentThread().getId();
-		 
+		lastlockName= cname;
 		 threadId = eventThread.getId();
 		 threadName = eventThread.getName();
 		 tStateName = eventThread.getState().toString();
@@ -235,28 +234,50 @@ public class RuntimeData {
 		 thread = new	se.kth.tracedata.jvm.ThreadInfo(threadId, tStateName, threadName,lastLockRef,lastlockName);
 		return (thread);
 	}
-	 static synchronized ChoiceGenerator<ThreadInfo> updateChoiceGenerator(String methodName, int i)
+	 static synchronized ChoiceGenerator<ThreadInfo> updateChoiceGenerator(String methodName)
 	{
-		 
-		//long threadId = Thread.currentThread().getId();
-		if(i==0 ) {
-			cg = new ThreadChoiceFromSet("ROOT", false,threadId,0); 
-			
+		if(methodName.length() > 0)
+		{
+			//long threadId = Thread.currentThread().getId();
+			if(isFirst) {
+				cg = new ThreadChoiceFromSet("ROOT", false,threadId,locationNo); 
+				
+			}
+			else if(methodName == "start") {
+						
+				cg = new ThreadChoiceFromSet("START", false,threadId,locationNo); 		
+			}
+			else if(methodName == "join") {
+				
+				cg = new ThreadChoiceFromSet("JOIN", false,threadId,locationNo); 		
+			}
+			else if(methodName == "wait") {
+				
+				cg = new ThreadChoiceFromSet("WAIT", false,threadId,locationNo); 		
+			}
+			else if((methodName == "lock") || isSync) {
+				
+				cg = new ThreadChoiceFromSet("LOCK", false,threadId,locationNo); 		
+			}
+			else if(methodName == "unlock") {
+						
+						cg = new ThreadChoiceFromSet("RELEASE", false,threadId,locationNo); 		
+					}
+			else if(methodName == "run" || methodName == "main") {
+				
+				cg = new ThreadChoiceFromSet("TERMINATE", false,threadId,locationNo); 		
+			}
+			else{
+				
+				cg = new ThreadChoiceFromSet("Running", false,threadId,locationNo); 		
+			}
 		}
-		else if(methodName == "start") {
-					
-			cg = new ThreadChoiceFromSet("START", false,threadId,1); 		
-		}
-		else if(methodName == "join") {
-			
-			cg = new ThreadChoiceFromSet("JOIN", false,threadId,2); 		
-		}
-		else if(methodName == "wait") {
-			
-			cg = new ThreadChoiceFromSet("WAIT", false,threadId,2); 		
-		}
+		
+		
 		return cg;
 	}
+	
+
 	 static synchronized void singleThreadProg()
 	{
 		if(stack.size() == 0 && !threadChange )
@@ -270,7 +291,7 @@ public class RuntimeData {
 	  */
 	 static synchronized void addLastTransition()
 		{
-			if(totalTrans > stack.size() )
+			if(totalTrans > stack.size() && tr!=null )
 			 {
 				 addPreviousTr(tr); 
 			 }
@@ -287,8 +308,7 @@ public void displayErrorTrace() {
 		
 		se.kth.jpf_visual.ErrorTracePanel gui = new se.kth.jpf_visual.ErrorTracePanel();
 			Path p= new se.kth.tracedata.jvm.Path(app,stack);
-				gui.drowJVMErrTrace(p, true);
-		
+				gui.drowJVMErrTrace(p, true);	
 		 }
 	
 
