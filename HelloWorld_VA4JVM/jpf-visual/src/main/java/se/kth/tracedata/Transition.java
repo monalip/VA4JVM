@@ -16,6 +16,7 @@ public interface Transition extends Iterable<Step> {
 	public String getOutput ();
 
 	public Iterator<Step> iterator();
-	void addStep(Step step);
+	public void addStep(Step step);
+	public void setChoiceGenerator(ChoiceGenerator<ThreadInfo> cg);
 	
 }

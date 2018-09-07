@@ -105,6 +105,14 @@ public class Transition implements se.kth.tracedata.Transition, Iterable<Step>{
 	public void addStep(Step step) {
 		
 	}
+
+	@Override
+	public void setChoiceGenerator(se.kth.tracedata.ChoiceGenerator<ThreadInfo> cg) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 	
 	
 	

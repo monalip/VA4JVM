@@ -7,14 +7,14 @@ import se.kth.tracedata.Step;
 import se.kth.tracedata.ThreadInfo;
 
 public class Transition implements se.kth.tracedata.Transition,Iterable<Step>{
-	 private ChoiceGenerator<?> cg;
+	 private ChoiceGenerator<ThreadInfo> cg;
 	private ThreadInfo ti;
 
 	  private Step first;
 	  se.kth.tracedata.jvm.Step last = new se.kth.tracedata.jvm.Step();
 	  int nSteps=0;
 
-	public Transition (ChoiceGenerator<?> cg, ThreadInfo ti) {
+	public Transition (ChoiceGenerator<ThreadInfo> cg, ThreadInfo ti) {
 		    this.cg = cg;
 		    this.ti = ti;
 		  }
@@ -74,6 +74,12 @@ public class Transition implements se.kth.tracedata.Transition,Iterable<Step>{
 		    nSteps++;
 		
 	}
+	@Override
+	public void setChoiceGenerator(ChoiceGenerator<ThreadInfo>cg) {
+		this.cg = cg;
+		
+	}
+	
 	
 
 }
