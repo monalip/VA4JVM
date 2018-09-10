@@ -79,6 +79,10 @@ public class RuntimeData {
 	static Set<Thread> threads = new HashSet<Thread>();
 	static int totalTrans = 0;
 	static boolean isSync =false;
+	static boolean isSynchBlock =false;
+	static boolean isUnLock =false;
+	
+	static int eventAdded = 0;
 	// constructor is private to make this class cannot instantiate from outside
 	private  RuntimeData()
 	{
@@ -134,6 +138,19 @@ public class RuntimeData {
 		addPreviousStep();
 		
 	
+	}
+	static synchronized void createLockInstruction()
+	{
+		
+			ci=new se.kth.tracedata.jvm.ClassInfo(cname);
+			mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,false);
+			insn = new LockInstruction(lastLockRef);
+			insn.setMethodInfo(mi);
+			getSourceString();
+			addPreviousStep();
+		
+		
+		
 	}
 	
 	static synchronized void createFieldInstruction()
@@ -192,6 +209,7 @@ public class RuntimeData {
 	  }
 	  isSync =false;
 	  isFirst = false;
+	  eventAdded++;
 	
 	
 	}
@@ -240,36 +258,38 @@ public class RuntimeData {
 		{
 			//long threadId = Thread.currentThread().getId();
 			if(isFirst) {
-				cg = new ThreadChoiceFromSet("ROOT", false,threadId,locationNo); 
+				cg = new ThreadChoiceFromSet("ROOT", false,threadId,eventAdded); 
 				
 			}
 			else if(methodName == "start") {
 						
-				cg = new ThreadChoiceFromSet("START", false,threadId,locationNo); 		
+				cg = new ThreadChoiceFromSet("START", false,threadId,eventAdded); 		
 			}
 			else if(methodName == "join") {
 				
-				cg = new ThreadChoiceFromSet("JOIN", false,threadId,locationNo); 		
+				cg = new ThreadChoiceFromSet("JOIN", false,threadId,eventAdded); 		
 			}
 			else if(methodName == "wait") {
 				
-				cg = new ThreadChoiceFromSet("WAIT", false,threadId,locationNo); 		
+				cg = new ThreadChoiceFromSet("WAIT", false,threadId,eventAdded); 		
 			}
-			else if((methodName == "lock") || isSync) {
+			else if((methodName == "lock") || isSync || isSynchBlock) {
 				
-				cg = new ThreadChoiceFromSet("LOCK", false,threadId,locationNo); 		
+				cg = new ThreadChoiceFromSet("LOCK", false,threadId,eventAdded); 	
+				isSynchBlock=false;
 			}
-			else if(methodName == "unlock") {
+			else if(methodName == "unlock" || isUnLock) {
 						
-						cg = new ThreadChoiceFromSet("RELEASE", false,threadId,locationNo); 		
+						cg = new ThreadChoiceFromSet("RELEASE", false,threadId,eventAdded); 
+						isUnLock=false;
 					}
 			else if(methodName == "run" || methodName == "main") {
 				
-				cg = new ThreadChoiceFromSet("TERMINATE", false,threadId,locationNo); 		
+				cg = new ThreadChoiceFromSet("TERMINATE", false,threadId,eventAdded); 		
 			}
 			else{
 				
-				cg = new ThreadChoiceFromSet("Running", false,threadId,locationNo); 		
+				cg = new ThreadChoiceFromSet("Running", false,threadId,eventAdded); 		
 			}
 		}
 		
@@ -303,8 +323,8 @@ public void displayErrorTrace() {
 		singleThreadProg();
 		addLastTransition();
 		//Sort the stack based on the transition threadId to get group of same transion inthe main pannel
-		Collections.sort(stack, new SortStackPriority());
-		Collections.sort(stack, new SortStack());
+		//Collections.sort(stack, new SortStackPriority());
+		//Collections.sort(stack, new SortStack());
 		
 		se.kth.jpf_visual.ErrorTracePanel gui = new se.kth.jpf_visual.ErrorTracePanel();
 			Path p= new se.kth.tracedata.jvm.Path(app,stack);
