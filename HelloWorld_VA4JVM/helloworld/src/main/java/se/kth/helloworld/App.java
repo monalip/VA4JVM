@@ -35,6 +35,10 @@ public class App
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
+		synchronized (String.class) 
+		{
+		 System.out.println("After this point method object is unlock on String.class ");
+		}
 		
 		System.out.println("Finish");
        
@@ -75,6 +79,7 @@ class MyThread implements Runnable
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
+            name = "unlock";
 		}
 		
 		
