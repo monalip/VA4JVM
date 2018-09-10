@@ -165,6 +165,7 @@
 					<outxml>true</outxml>
 					<verbose>true</verbose>
 					<showWeaveInfo>true</showWeaveInfo>
+					<Xjoinpoints>synchronization</Xjoinpoints>
 		
 					<aspectLibraries>
 				      <aspectLibrary>
