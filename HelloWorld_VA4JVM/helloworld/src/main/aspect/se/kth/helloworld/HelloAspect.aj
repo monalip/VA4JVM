@@ -30,6 +30,58 @@ aspect HelloAspect {
 	 * 
 	 * Lock unlock
 	 */
+	before(Object l): lock() && args(l) && !within(HelloAspect) && !within(RuntimeData)
+	{	synchronized (this) {
+		
+	
+		sign = (thisJoinPointStaticPart.getSignature()).toString();
+		locationName = sign.toString();
+		sourceString = locationName.substring(locationName.lastIndexOf('.') + 1);
+		packagename = thisJoinPoint.getSignature().getDeclaringTypeName();
+		className = packagename.substring(packagename.lastIndexOf('.') + 1);
+		methodName = thisJoinPoint.getSignature().getName();
+		sourceLocation = thisJoinPoint.getSourceLocation().toString();
+		lineNo = Integer.parseInt(sourceLocation.substring(sourceLocation.lastIndexOf(':') + 1));
+		threadaspectj = Thread.currentThread();	//System.out.println("Second: " +methodName);
+		thread = Thread.currentThread().getId();
+		fieldName=l.toString();
+		if(lineNo != 0)
+		{	global.isSynchBlock=true;
+			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj);
+			global.createLockInstruction();
+
+		}
+	}
+		
+	}
+	before(Object l): unlock() && args(l) && !within(HelloAspect) && !within(RuntimeData)
+	{	synchronized (this) {
+		
+	
+		sign = (thisJoinPointStaticPart.getSignature()).toString();
+		locationName = sign.toString();
+		sourceString = locationName.substring(locationName.lastIndexOf('.') + 1);
+		packagename = thisJoinPoint.getSignature().getDeclaringTypeName();
+		className = packagename.substring(packagename.lastIndexOf('.') + 1);
+		methodName = thisJoinPoint.getSignature().getName();
+		sourceLocation = thisJoinPoint.getSourceLocation().toString();
+		lineNo = Integer.parseInt(sourceLocation.substring(sourceLocation.lastIndexOf(':') + 1));
+		threadaspectj = Thread.currentThread();	//System.out.println("Second: " +methodName);
+		thread = Thread.currentThread().getId();
+		fieldName=l.toString();
+		if(lineNo != 0)
+		{
+			
+			global.isUnLock=true;
+			updateGlobalVar(sign,className,methodName,thread,locationName,lineNo,fieldName,threadaspectj);
+			global.createLockInstruction();
+
+		}
+	}
+		
+	}
+
+
 	private static final Object lock = new Object();
 	pointcut syncJointPoint(): execution(synchronized* *.*(..)) && !within(HelloAspect); // or call()}*/
 
@@ -103,12 +155,12 @@ aspect HelloAspect {
         System.out.println("Second: " +thisJoinPoint);
     }*/
 	
-	after(Object lock):execution( synchronized* *.*(..)) && !within(HelloAspect) && target(lock)
+	/*after(Object lock):execution( synchronized* *.*(..)) && !within(HelloAspect) && target(lock)
     {
     	//System.out.println("around(App) lock: advice running at "+thisJoinPoint.getSourceLocation());
 
-    }
-	/**
+    }*/
+		/**
 	 * 
 	 * thread inforamtion
 	 * */
@@ -174,7 +226,7 @@ aspect HelloAspect {
 					}
 					else if(methodName=="lock" || methodName=="unlock")
 					{
-						//global.createLockInstruction();
+						global.createLockInstruction();
 					}
 					else
 					{
@@ -274,7 +326,6 @@ aspect HelloAspect {
 			global.eventThread =threadaspectj;
 			//System.out.println("Aspectj Method Name "+ methodName+" \n");
 			//System.out.println("Aspectj Field Name "+ fieldName+" \n");
-			//System.out.println("Aspectj ThreadId Name "+ thread+" \n");
 			
 			
 			
