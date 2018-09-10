@@ -80,6 +80,7 @@ public class TraceData {
 		processSynchronizedMethods();
 	}
 
+
 	private void firstPass() {
 		int currTran = 0;
 		int prevThread = -1;
@@ -138,11 +139,8 @@ public class TraceData {
 				Transition transition = path.get(i);
 				String lastLine = null;
 				
-				
-
 				int nNoSrc = 0;
 				ChoiceGenerator<?> cg = transition.getChoiceGenerator();
-
 				//if (cg instanceof ThreadChoiceFromSet) {
 				//if condition is checked with the isInstaceofThreadChoiceFromSet() method in choicegeneraotr for jpf error trace
 				//as the cg is of type jpf as we are using adapters

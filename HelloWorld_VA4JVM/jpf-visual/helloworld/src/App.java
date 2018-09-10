@@ -1,9 +1,12 @@
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class App 
 {
 	static int a = 3;
 	static int b = 5;
+
+	private final ReentrantLock lock = new ReentrantLock();
 
 	
    public App()
@@ -17,23 +20,29 @@ public class App
        String name = "Monali Pande";
 		App app = new App();
 		System.out.println("App values: "+app.a);
-		int r = add(2,3);
+		int r = app.add(2,3);
 		MyThread t = new MyThread(name);
+		app.m();
 		
 		new Thread(t).start();
 		try {
 			new Thread(t).join();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
-		System.out.print("Finish");
-		r=1/0;
+		
+		System.out.println("Finish");
+		
        
     }
-
-	private static int add(int a2, int b2) {
+	public synchronized void m() {
 		
+		int count = 0;
+
+	}
+
+	 int add(int a2, int b2) {
+	System.err.println("non-static method running");		
 		return a2+b2;
 	}
 	
@@ -63,6 +72,7 @@ class MyThread implements Runnable
                 e.printStackTrace();
             }
 		}
+		int k = 4/0;
 		
 		
 	}
