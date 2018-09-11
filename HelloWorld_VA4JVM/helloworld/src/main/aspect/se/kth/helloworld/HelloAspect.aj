@@ -30,7 +30,7 @@ aspect HelloAspect {
 	 * 
 	 * Lock unlock
 	 */
-	before(Object l): lock() && args(l) && !within(HelloAspect) && !within(RuntimeData)
+	before(Object l): (lock() || unlock()) && args(l) && !within(HelloAspect) && !within(RuntimeData)
 	{	synchronized (this) {
 		
 	
@@ -46,34 +46,16 @@ aspect HelloAspect {
 		thread = Thread.currentThread().getId();
 		fieldName=l.toString();
 		if(lineNo != 0)
-		{	global.isSynchBlock=true;
-			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj);
-			global.createLockInstruction();
-
-		}
-	}
-		
-	}
-	before(Object l): unlock() && args(l) && !within(HelloAspect) && !within(RuntimeData)
-	{	synchronized (this) {
-		
-	
-		sign = (thisJoinPointStaticPart.getSignature()).toString();
-		locationName = sign.toString();
-		sourceString = locationName.substring(locationName.lastIndexOf('.') + 1);
-		packagename = thisJoinPoint.getSignature().getDeclaringTypeName();
-		className = packagename.substring(packagename.lastIndexOf('.') + 1);
-		methodName = thisJoinPoint.getSignature().getName();
-		sourceLocation = thisJoinPoint.getSourceLocation().toString();
-		lineNo = Integer.parseInt(sourceLocation.substring(sourceLocation.lastIndexOf(':') + 1));
-		threadaspectj = Thread.currentThread();	//System.out.println("Second: " +methodName);
-		thread = Thread.currentThread().getId();
-		fieldName=l.toString();
-		if(lineNo != 0)
+		{	
+		if(thisJoinPoint.getKind().toString()=="lock")
 		{
-			
+			global.isSynchBlock=true;
+		}
+		else if(thisJoinPoint.getKind().toString()=="unlock")
+		{
 			global.isUnLock=true;
-			updateGlobalVar(sign,className,methodName,thread,locationName,lineNo,fieldName,threadaspectj);
+		}
+			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj);
 			global.createLockInstruction();
 
 		}
