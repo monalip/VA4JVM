@@ -1,6 +1,7 @@
 package se.kth.helloworld;
 
 import java.io.BufferedReader;
+import com.sun.jndi.toolkit.url.Uri;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
@@ -226,15 +227,27 @@ public class RuntimeData {
 	 static synchronized void getSourceString()
 	 {
 		//code to get the particular line source code
+		// get path of current directory System.out.println(new File(".").getAbsoluteFile());
+		   
 		   try
 			{
-			   // get path of current directory System.out.println(new File(".").getAbsoluteFile());
-			   //For maven 
-			   	sourceString = Files.readAllLines(Paths.get("./helloworld/src/main/java/se/kth/helloworld/App.java")).get(locationNo-1);
-			   //For eclipse 
-			   	//sourceString = (Files.readAllLines(Paths.get("./src/main/java/se/kth/helloworld/App.java")).get(locationNo - 1)).trim();
-			   
-				
+			   File file = new File("./src/main/java/se/kth/helloworld/App.java");
+				String path = file.getAbsolutePath();
+				boolean isFileExist = file.exists();
+				//if we are executing script from eclipse the current directory is differenent and same thing for the Maven script
+				// Hence the path of the file is depends upon path from which we are running the script
+				if(isFileExist)
+				{
+					//For eclipse 
+					sourceString = (Files.readAllLines(Paths.get(path)).get(locationNo - 1)).trim();
+				}
+				else
+				{
+					 //For maven 
+					file =  new File("./helloworld/src/main/java/se/kth/helloworld/App.java");
+					path = file.getAbsolutePath();
+				}
+				sourceString = (Files.readAllLines(Paths.get(path)).get(locationNo - 1)).trim();
 			}
 			catch (Exception e) {
 				e.printStackTrace();
