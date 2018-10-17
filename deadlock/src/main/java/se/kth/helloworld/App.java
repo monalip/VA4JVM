@@ -11,8 +11,6 @@ import se.kth.helloworld.aspect.RuntimeData;
 public class App 
 { 
 	
-	
-	
 	  public static void main(String[] args) {
 		  
 	        int num = 5;
@@ -47,6 +45,7 @@ public class App
 	class Philosopher extends Thread {
 		static Object globalLock = new Object();
 		RuntimeData global= RuntimeData.getInstance();
+		boolean isdeadlock = false;
 		
 	    public ReentrantLock rightFork;
 	    public ReentrantLock leftFork;
@@ -62,14 +61,15 @@ public class App
 	        while (true) {
 	        	synchronized (globalLock) 
 	        	{
+	        		 
 					 rightFork.lock();
+					 
 				}
 	        	synchronized (globalLock) 
 	        	{
 	        		while (leftFork.isLocked()) 
 	        		{
-						if(global.threads.size()==5)
-						{
+	        			
 							int countval=0;
 							for(Thread t:global.threads)
 							   {
@@ -84,6 +84,7 @@ public class App
 							 if(countval == 1)
 							 {
 								 System.out.println("Deadlock...");
+								 isdeadlock = true;
 								   //Start GUI
 								 	global.displayErrorTrace();
 								 // clear the threadList
@@ -91,7 +92,7 @@ public class App
 								  //System.exit(0); //it is not working as the System.exit(0) immediately terminating visualization window also
 								   
 							 }
-						}
+						
 								try {
 								globalLock.wait();
 							} catch (InterruptedException e) {
