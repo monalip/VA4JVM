@@ -1,0 +1,12 @@
+target=DaytimeServer
+
+classpath=.
+sourcepath=.
+
+extensions=${jpf-core}
+report.console.property_violation=result,error,trace,snapshot
+
+jpf-net-iocache=.
+listener=
+jpf-net-iocache.native_classpath=.
+jpf-net-iocache.classpath=.

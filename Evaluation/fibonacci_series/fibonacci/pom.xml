@@ -1,0 +1,287 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>se.kth</groupId>
+  <artifactId>Fibonacci</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <!-- -<packaging>jar</packaging> not allowwed as to use the modules has to be a "pom" project -->
+  <packaging>jar</packaging>
+
+  <name>Fibonacci</name>
+  <url>http://maven.apache.org</url>
+  
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<aspectj.version>1.8.4</aspectj.version>
+		<java.version>1.8</java.version>
+    
+  </properties>
+  
+ <dependencies>
+ 		
+ 		<dependency>
+ 		<groupId>se.kth</groupId>
+		  <artifactId>jpf-visual</artifactId>
+		  <version>0.0.2-SNAPSHOT</version>
+		  <scope>compile</scope>
+ 		</dependency>
+	   <dependency>
+		  <groupId>com.jcabi</groupId>
+		  <artifactId>jcabi-aspects</artifactId>
+		  <version>0.22.6</version>
+		</dependency>
+		<!-- AOP dependency -->
+		<dependency>
+		    <groupId>org.aspectj</groupId>
+		    <artifactId>aspectjrt</artifactId>
+		    <version>${aspectj.version}</version>
+		</dependency>
+		<dependency>
+	      <groupId>junit</groupId>
+	      <artifactId>junit</artifactId>
+	      <version>3.8.1</version>
+	      <scope>test</scope>
+    	</dependency>
+    	<dependency>
+    	<groupId>jgraphx</groupId>
+		 		<artifactId>graphixfile</artifactId>
+		 		<version>1.0</version>
+		 		<scope>compile</scope>
+    	</dependency>
+    	 
+
+ </dependencies>
+	<build>
+	<pluginManagement>
+	<plugins>
+		<!--This plugin's configuration is used to store Eclipse m2e settings only. 
+			It has no influence on the Maven build itself. -->
+		
+	
+			<plugin>
+				
+      
+	        <groupId>com.jcabi</groupId>
+	        <artifactId>jcabi-maven-plugin</artifactId>
+	        <version>0.8</version>
+	        <executions>
+	          <execution>
+	            <goals>
+	              <goal>ajc</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+    
+			</plugin>
+			<!--This plugin's configuration is used to store Eclipse m2e settings only. 
+			It has no influence on the Maven build itself. -->
+		<plugin>
+			<groupId>org.eclipse.m2e</groupId>
+			<artifactId>lifecycle-mapping</artifactId>
+			<version>1.0.0</version>
+			<configuration>
+				<lifecycleMappingMetadata>
+					<pluginExecutions>
+						<pluginExecution>
+							<pluginExecutionFilter>
+								<groupId>org.codehaus.mojo</groupId>
+								<artifactId>aspectj-maven-plugin</artifactId>
+								<versionRange>[1.0,)</versionRange>
+								<goals>
+									<goal>test-compile</goal>
+									<goal>compile</goal>
+								</goals>
+							</pluginExecutionFilter>
+							<action>
+								<execute />
+							</action>
+						</pluginExecution>
+						<pluginExecution>
+							<pluginExecutionFilter>
+								<groupId>
+									org.apache.maven.plugins
+								</groupId>
+								<artifactId>
+									maven-install-plugin
+								</artifactId>
+								<versionRange>
+									[2.5,)
+								</versionRange>
+								<goals>
+									<goal>install-file</goal>
+								</goals>
+							</pluginExecutionFilter>
+							<action>
+								<execute>
+									<runOnIncremental>false</runOnIncremental>
+								</execute>
+							</action>
+						</pluginExecution>
+					</pluginExecutions>
+				</lifecycleMappingMetadata>
+			</configuration>
+		</plugin>
+			
+		</plugins>
+	</pluginManagement>
+	
+		<plugins>
+		<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-install-plugin</artifactId>
+    <version>2.5</version>
+    <executions>
+        <execution>
+            <phase>clean</phase>
+            <goals>
+                <goal>install-file</goal>
+            </goals>
+            <configuration>
+                <groupId>jgraphx</groupId>
+		 		<artifactId>graphixfile</artifactId>
+		 		<version>1.0</version>
+                <packaging>jar</packaging>
+                <file>${basedir}/lib/jgraphx.jar</file>
+            </configuration>
+        </execution>
+    </executions>
+     
+</plugin>
+		<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>aspectj-maven-plugin</artifactId>
+				<version>1.8</version>
+				<configuration>
+					<!-- In order to make use of Java 8 features in aspects we need to set 
+						the following statements -->
+					<complianceLevel>${java.version}</complianceLevel>
+					<!-- Optional configurations for the aspect compiler -->
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+					<outxml>true</outxml>
+					<verbose>true</verbose>
+					<showWeaveInfo>true</showWeaveInfo>
+					<Xjoinpoints>synchronization</Xjoinpoints>
+		
+					<aspectLibraries>
+				      <aspectLibrary>
+				        <groupId>com.jcabi</groupId>
+				        <artifactId>jcabi-aspects</artifactId>
+				      </aspectLibrary>
+				    </aspectLibraries>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.aspectj</groupId>
+						<artifactId>aspectjtools</artifactId>
+						<version>${aspectj.version}</version>
+					</dependency>
+					
+				</dependencies>
+				<executions>
+					<execution>
+						<!-- In order to run ajc (i.e. compiler and bytecode weaver for the 
+							AspectJ and Java languages) before javac (no need), we add a phase tag to 
+							the execution tag -->
+						<phase>process-sources</phase>	<!-- or any phase before compile -->
+						<goals>
+							<!-- Weave all the main classes (.java) and aspects (.aj) -->
+							<goal>compile</goal>
+							<!-- Weave all the test classes -->
+							<!-- if you have test classes, just uncomment test-compile statement -->
+							<!-- <goal>test-compile</goal> -->
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+				<includePluginDependencies>true</includePluginDependencies>
+					<mainClass>se.kth.helloworld.Fibonacci</mainClass>
+					<arguments>
+					<argument>-classpath</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+
+			<!-- to ensure correct JDK is attached on your mvn (needs 1.8) if so, 
+				just ignore this plug-in -->
+			<!-- normally we don't need this for mvn clean install exec:java -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>	<!-- version number is also important, must be 2.5.1! (default - this plug-in 
+					can be deleted) -->
+				<configuration>
+					<!-- considering the java version which is 1.8 for mvn -->
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.5.5</version>
+				<configuration>
+				 <appendAssemblyId>false</appendAssemblyId>
+				 <descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>se.kth.helloworld.Fibonacci</mainClass>
+						</manifest>
+					</archive>
+					
+				</configuration>
+				<executions>
+        <execution>
+            <id>a-make-assembly</id>
+            <phase>package</phase>
+            <goals>
+                <goal>single</goal>
+            </goals>
+        </execution>
+    </executions>
+			</plugin>
+			<plugin>
+			<!-- Build an executable JAR -->
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-jar-plugin</artifactId>
+      <version>3.0.2</version>
+      <configuration>
+        <archive>
+          <manifest>
+            <addClasspath>true</addClasspath>
+            <classpathPrefix>lib/</classpathPrefix>
+            <mainClass>se.kth.helloworld.Fibonacci</mainClass>
+          </manifest>
+        </archive>
+      </configuration>
+    </plugin>
+			
+		</plugins>
+	
+		
+	</build>
+	
+	
+
+ 
+</project>
