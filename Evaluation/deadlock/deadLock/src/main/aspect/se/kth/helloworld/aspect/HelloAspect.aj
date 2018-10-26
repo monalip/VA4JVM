@@ -185,6 +185,7 @@ aspect HelloAspect {
 				maxThreadId = childThread.getId();
 				global.maxThreadId = maxThreadId;
 			}
+			global.threadtoAdd = childThread;
 			global.threads.add(childThread);
 			
 		}

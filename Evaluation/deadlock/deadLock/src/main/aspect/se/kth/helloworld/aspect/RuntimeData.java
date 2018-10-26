@@ -84,6 +84,7 @@ public class RuntimeData {
 	static boolean isSynchBlock =false;
 	static boolean isUnLock =false;
 	public long maxThreadId =0;
+	public static Thread threadtoAdd=null;
 	
 	static int eventAdded = 0;
 	// constructor is private to make this class cannot instantiate from outside
@@ -246,7 +247,7 @@ public class RuntimeData {
 				{
 					 //For maven 
 					//location = "helloworld/"+location;
-					location = "deadlock/src/main/java/se/kth/helloworld/App.java";
+					location = "DeadLock/src/main/java/se/kth/helloworld/App.java";
 					file =  new File(location);
 					path = file.getAbsolutePath();
 				}
@@ -334,6 +335,7 @@ public class RuntimeData {
 				 addPreviousTr(tr); 
 			 }
 		}
+	
 	 
 	
 	
@@ -347,6 +349,10 @@ public void displayErrorTrace() {
 			Path p= new se.kth.tracedata.jvm.Path(app,stack);
 				gui.drowJVMErrTrace(p, true);	
 		 }
+public Set<Thread> getThread() {
+	return threads;
+	
+}
 
 	
 
