@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>se.kth</groupId>
+  <artifactId>oldclassic</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<aspectj.version>1.8.4</aspectj.version>
+		<java.version>1.8</java.version>
+    
+  </properties>
+  <build>
+  	<plugins>
+  	<plugin>
+  
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+				<includePluginDependencies>true</includePluginDependencies>
+					<mainClass>multithread.oldclassic</mainClass>
+					<arguments>
+					<argument>-classpath</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+
+			<!-- to ensure correct JDK is attached on your mvn (needs 1.8) if so, 
+				just ignore this plug-in -->
+			<!-- normally we don't need this for mvn clean install exec:java -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>	<!-- version number is also important, must be 2.5.1! (default - this plug-in 
+					can be deleted) -->
+				<configuration>
+					<!-- considering the java version which is 1.8 for mvn -->
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.5.5</version>
+				<configuration>
+				 <appendAssemblyId>false</appendAssemblyId>
+				 <descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>multithread.oldclassic</mainClass>
+						</manifest>
+					</archive>
+					
+				</configuration>
+				<executions>
+        <execution>
+            <id>a-make-assembly</id>
+            <phase>package</phase>
+            <goals>
+                <goal>single</goal>
+            </goals>
+        </execution>
+    </executions>
+			</plugin>
+			<plugin>
+			<!-- Build an executable JAR -->
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-jar-plugin</artifactId>
+      <version>3.0.2</version>
+      <configuration>
+        <archive>
+          <manifest>
+            <addClasspath>true</addClasspath>
+            <classpathPrefix>lib/</classpathPrefix>
+            <mainClass>multithread.oldclassic</mainClass>
+          </manifest>
+        </archive>
+      </configuration>
+    </plugin>
+	</plugins>
+
+  </build>
+</project>
