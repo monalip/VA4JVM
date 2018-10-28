@@ -15,5 +15,6 @@ public abstract class Instruction {
 	public  abstract boolean isInstanceofFieldIns();
 	public 	abstract String getVariableId();
 	public 	abstract void setMethodInfo(MethodInfo mi);
-	
+	public abstract String getLastlockName();
+
 }

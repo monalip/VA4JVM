@@ -77,4 +77,10 @@ public class JVMReturnInstruction extends se.kth.tracedata.JVMReturnInstruction{
 		
 	}
 
+	@Override
+	public String getLastlockName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

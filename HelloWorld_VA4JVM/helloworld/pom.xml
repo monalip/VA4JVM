@@ -215,7 +215,7 @@
 				<includePluginDependencies>true</includePluginDependencies>
 					<mainClass>se.kth.helloworld.App</mainClass>
 					<arguments>
-					<argument>-classpath</argument>
+					<argument>5</argument>
 					</arguments>
 				</configuration>
 			</plugin>

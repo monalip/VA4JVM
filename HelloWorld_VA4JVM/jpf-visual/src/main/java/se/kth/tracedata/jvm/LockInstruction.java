@@ -4,12 +4,16 @@ import se.kth.tracedata.MethodInfo;
 
 public class LockInstruction extends se.kth.tracedata.LockInstruction{
 	int lastLockRef;
+	String lastLockName;
 	MethodInfo mi;
-	
-	public LockInstruction(int lastLockRef) {
-		this.lastLockRef = lastLockRef; 
+
+	public LockInstruction(int lastLockRef2, String lastlockName2) {
+		this.lastLockRef = lastLockRef2;
+		this.lastLockName=lastlockName2;
 	}
-	
+
+
+
 
 	@Override
 	public int getLastLockRef() {
@@ -79,6 +83,11 @@ public class LockInstruction extends se.kth.tracedata.LockInstruction{
 	public void setMethodInfo(MethodInfo method) {
 		mi = method;
 		
+	}
+	@Override
+	public String getLastlockName() {
+		// TODO Auto-generated method stub
+		return lastLockName;
 	}
 
 }

@@ -35,7 +35,7 @@ public class TraceData {
 	private int numOfThreads = -1;
 	private List<String> threadNames = null;
 	
-
+	private String lastLockName= null;
 	private Path path;
 	
 	private List<Integer> threadId = null;
@@ -88,6 +88,11 @@ public class TraceData {
 		
 	
 		for(Transition t: path) {
+			String choiId =t.getChoiceGenerator().getId();
+			long threadtransitionId = t.getThreadInfo().getId();
+			
+			 //System.out.println("Choice Id  "+choiId+"ThreadId "+threadtransitionId+"\n");
+				
 			int currThread = t.getThreadIndex();
 			
 			//Logic to add the unique thread Name
@@ -133,6 +138,14 @@ public class TraceData {
 			ArrayList<TextLine> lineList = new ArrayList<>();
 			TextLineList txtLinelist = new TextLineList(lineList);
 			lineTable.put(pi, txtLinelist);
+			/*for (Integer i: lineTable.keySet()){
+
+	            int key =i;
+	            String value = example.get(name).toString();  
+	            System.out.println(key + " " + value);  
+
+
+	}*/
 
 			boolean isFirst = true;
 			for (int i = from; i <= to; i++) {
@@ -147,9 +160,9 @@ public class TraceData {
 			
 				if (cg.isInstaceofThreadChoiceFromSet() || cg instanceof ThreadChoiceFromSet) {
 					
-					ThreadInfo ti = transition.getThreadInfo();
-					
-						processChoiceGenerator(cg, prevThreadIdx, pi, height, ti);
+						ThreadInfo ti = transition.getThreadInfo();
+						processChoiceGenerator(cg, prevThreadIdx, pi, height, ti,"");	
+						
 					
 				}
 
@@ -171,6 +184,7 @@ public class TraceData {
 							if (nNoSrc > 0) {
 								String noSrc = " [" + nNoSrc + " insn w/o sources]";
 								tempStr.append(noSrc + "\n");
+								
 								txtSrc = new TextLine(noSrc, false, false, transition, pi, height);
 								lineList.add(txtSrc);
 								height++;
@@ -187,13 +201,27 @@ public class TraceData {
 								txtSrc.setFirst();
 							}
 							lineList.add(txtSrc);
-
+							
+							
 							height++;
 							nNoSrc = 0;
 						}
 					} else { // no source
 						nNoSrc++;
 					}
+					
+					if(transition.getThreadInfo().getLastLockName() == "JVM") {	
+						if(cg.getId()=="START"||cg.getId()=="JOIN")
+						{
+							if(line.contains("start")||line.contains("join"))
+							{
+								
+							ThreadInfo ti = transition.getThreadInfo();
+							processChoiceGenerator(cg, prevThreadIdx, pi, height, ti,line);
+							}
+						}
+					}
+					
 					lastLine = line;
 
 					if (line != null && txtSrc != null) {
@@ -247,13 +275,24 @@ public class TraceData {
 	}
 
 	
-	private void processChoiceGenerator(ChoiceGenerator<?> cg, int prevThreadIdx, int pi, int height, ThreadInfo ti) {
+	private void processChoiceGenerator(ChoiceGenerator<?> cg, int prevThreadIdx, int pi, int height, ThreadInfo ti, String line) {
 		// thread start/join highlight
-		if ((cg.getId() == "START" || cg.getId() == "JOIN") && height>0) {
+	
+		
+		if ((cg.getId() == "START" || cg.getId() == "JOIN") && height>0 && ti.getLastLockName() != "JVM") {
 			if (lineTable.get(pi).getTextLine(height - 1).isSrc()) {
 				threadStartSet.add(new Pair<>(pi, height - 1));
 			}
+		
 			
+		}
+		if(ti.getLastLockName() == "JVM" && (cg.getId() == "START" || cg.getId() == "JOIN")&& height>0 &&(line.contains("start")||line.contains("join")))
+		{
+			if (lineTable.get(pi).getTextLine(height - 1).isSrc()) {
+				//System.out.println("Value: "+getTextLine(height - 1)+"\n");
+				threadStartSet.add(new Pair<>(pi, height - 1));
+			}
+			return;
 		}
 		Pair<Integer, Integer> tmp = new Pair<>(pi, height);
 
@@ -391,12 +430,18 @@ public class TraceData {
 			{
 				lastLock= insn.getLastLockRef();
 				fieldName = ti.getNameOfLastLock(lastLock);
+				
 			}
 			else if( insn instanceof LockInstruction)
 			{
 				lastLock = ((LockInstruction)insn).getLastLockRef();
 				fieldName = ti.getNameOfLastLock(lastLock);
+				if(fieldName=="JVM") {
+					
+					fieldName=((LockInstruction)insn).getLastlockName();
+				}
 			}
+			
 			
 			Pair<Integer, Integer> pair = new Pair<>(pi, height - 1);
 
@@ -410,11 +455,12 @@ public class TraceData {
 			}
 		}
 		
-		//if the method is lock then I have to use JVMReturnIns
+		//if the method is lock then I have to use JVMReturnIns synchronization method
 		//checking insn instanceof JVMReturnInstruction inside method isInstanceofJVMReturnIns() inside instruction adapter
 		if (line != null && (insn.isInstanceofJVMReturnIns() || insn instanceof JVMReturnInstruction)) {
 			String mName = mi.getFullName();
 			String cName = mi.getClassName();
+			//System.out.println("Class Name "+cName+"Method Naem"+mName+"\n");
 			if (lockMethodName.contains(mName)) {
 				Pair<Integer, Integer> pair = new Pair<>(pi, height - 1);
 				if (fieldNames.contains(cName)) {
@@ -543,14 +589,22 @@ public class TraceData {
 			 * 
 			 */
 			
-			
-				if (insn.isInstanceofVirtualInv() || insn instanceof VirtualInvocation )
-				{
-					String cName = null;
+			String cName = null;
 					String tmp = null;
+				if (insn.isInstanceofVirtualInv() )
+				{
+					
 						cName = insn.getInvokedMethodClassName();
 						tmp = cName + "." + insn.getInvokedMethodName();
 					
+				}
+				else if(insn instanceof VirtualInvocation) // modified as the getInvokedMethodClassName and getInvokedMethodName function are in the VirtualInvocation
+				{
+					cName = ((VirtualInvocation)insn).getInvokedMethodClassName();
+					tmp = cName + "." + ((VirtualInvocation)insn).getInvokedMethodName();
+					
+				}
+				
 				Pair<Integer, Integer> pair = new Pair<>(tl.getGroupNum(), tl.getLineNum());
 
 				if (lockMethodName.contains(tmp)) {
@@ -566,7 +620,7 @@ public class TraceData {
 				}
 			}
 		}
-	}
+	
 
 	public Set<Pair<Integer, Integer>> getClassField(String clsName, String fieldName) {
 		String target = clsName + "." + fieldName;
@@ -594,7 +648,8 @@ public class TraceData {
 			Step step = tl.getTransition().getStep(si);
 			Instruction insn = step.getInstruction();
 			String cName = insn.getMethodInfo().getClassInfo().getName();
-			if (clsName.equals(cName) && srcSet.contains(insn.getFileLocation())) {
+			if (clsName.equals(cName) && srcSet.contains(insn.getFileLocation()))
+			{
 				targetSet.add(new Pair<Integer, Integer>(tl.getGroupNum(), tl.getLineNum()));
 				break;
 			} 
@@ -606,10 +661,21 @@ public class TraceData {
 				//hence there is no need of seperate FieldInstruction class
 				 * 
 				 */
-				if (insn.getVariableId().equals(target)) {
-					targetSet.add(new Pair<Integer, Integer>(tl.getGroupNum(), tl.getLineNum()));
-					srcSet.add(insn.getFileLocation());
-					break;
+				if (insn.isInstanceofFieldIns() )
+				{
+					if (insn.getVariableId().equals(target)) {
+						targetSet.add(new Pair<Integer, Integer>(tl.getGroupNum(), tl.getLineNum()));
+						srcSet.add(insn.getFileLocation());
+						break;
+					}
+				}
+				else if(insn instanceof FieldInstruction)
+				{
+					if (((FieldInstruction)insn).getVariableId().equals(target)) {
+						targetSet.add(new Pair<Integer, Integer>(tl.getGroupNum(), tl.getLineNum()));
+						srcSet.add(((FieldInstruction)insn).getFileLocation());
+						break;
+					}
 				}
 			}
 		}

@@ -83,4 +83,10 @@ public class VirtualInvocation extends se.kth.tracedata.VirtualInvocation{
 		 this.mi = mi;
 	}
 
+	@Override
+	public String getLastlockName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

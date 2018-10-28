@@ -81,4 +81,11 @@ public class JVMInvokeInstruction extends se.kth.tracedata.JVMInvokeInstruction{
 		 this.mi = mi;
 		  }
 
+
+	@Override
+	public String getLastlockName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

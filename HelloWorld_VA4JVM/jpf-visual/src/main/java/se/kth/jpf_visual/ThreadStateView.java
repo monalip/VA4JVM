@@ -21,6 +21,9 @@ import se.kth.tracedata.Pair;
 import se.kth.tracedata.Path;
 
 public class ThreadStateView {
+	
+	//for JVM as thread Id is not start from 0
+	static String jvmName=null;
 
 	private double cellWidth = 0;
 	private mxIGraphModel model;
@@ -44,10 +47,11 @@ public class ThreadStateView {
 	private LocationInGraph location;
 
 	private List<Double> heightList = new ArrayList<>();
+	private List<Integer> threadId = null;
 
 	public ThreadStateView(double width, int nThreads, Path p, List<Pair<Integer, Integer>> grp,
 			Map<Integer, TextLineList> lt, Map<Pair<Integer, Integer>, List<Pair<Integer, String>>> threadStateMap,
-			LocationInGraph locate) {
+			LocationInGraph locate,List<Integer> threadId) {
 		this.cellWidth = width;
 		this.lineTable = lt;
 		this.numOfThreads = nThreads;
@@ -57,6 +61,7 @@ public class ThreadStateView {
 		this.numOfRows = group.size();
 		this.threadStateMap = threadStateMap;
 		this.location = locate;
+		this.threadId = threadId;
 		// create graph
 		this.graph = new mxGraph();
 
@@ -117,8 +122,15 @@ public class ThreadStateView {
 				mxCell rightCell = (mxCell) drawRightCell(row, currHt, rowCell);
 
 				int from = group.get(row)._1;
+				// As the threadId index for the JVM is not started from the 0 it is good to use the threadlist to get the properindex
 				int threadIdx = path.get(from).getThreadIndex();
-
+				if(path.get(from).getThreadInfo().getLastLockName()== "JVM")
+				{
+					threadIdx = threadId.indexOf(threadIdx);
+					jvmName ="JVM";
+				}
+				
+				
 				List<TextLine> txtLines = lineTable.get(row).getList();
 				int plainLines = 0;
 				for (int ithLine = 0; ithLine < txtLines.size(); ithLine++) {
@@ -254,6 +266,12 @@ public class ThreadStateView {
 					// reposition trheadStateCell
 					for (Object threadStateCell : graph.getChildCells(blankCell)) {
 						int ti = Integer.parseInt(((mxCell) threadStateCell).getId());
+						// For resize we need the threadIndex of JVM as threadId is not started from 0
+						if(jvmName == "JVM")
+						{
+							ti =threadId.indexOf(ti);
+							
+						}
 						model.getGeometry(threadStateCell).setX(ti * cellWidth);
 					}
 				}

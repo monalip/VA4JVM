@@ -7,5 +7,6 @@ public interface ThreadInfo {
 	public String getStateName () ;
 	public String getName ();
 	public String getNameOfLastLock(int lastLockRef);
+	public String getLastLockName();
 
 }

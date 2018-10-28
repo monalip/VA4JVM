@@ -75,4 +75,11 @@ public class Instruction extends se.kth.tracedata.Instruction{
 		    this.mi = mi;
 		  }
 
+	@Override
+	public String getLastlockName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 }

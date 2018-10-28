@@ -7,4 +7,6 @@ public abstract class LockInstruction extends Instruction
 	    */
 	  public abstract int getLastLockRef () ;
 
+	
+
 }

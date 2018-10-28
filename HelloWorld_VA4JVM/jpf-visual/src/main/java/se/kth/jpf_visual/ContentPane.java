@@ -35,6 +35,8 @@ import se.kth.tracedata.Path;
  */
 
 public class ContentPane {
+	//for JVM as thread Id is not start from 0
+		static String jvmName=null;
 
 	private double cellWidth = 0;
 	private mxGraph graph;
@@ -181,6 +183,11 @@ public class ContentPane {
 			String st = model.getStyle(threadLabel);
 			Map<String, Object> tmpStyle = graph.getStylesheet().getStyles().get(st);
 			int threadIdx = Integer.parseInt(((mxCell) threadLabel).getId());
+			if(jvmName == "JVM")
+			{
+				threadIdx = threadId.indexOf(threadIdx);
+				
+			}
 			tmpStyle.put(mxConstants.STYLE_SPACING_LEFT,
 					cellWidth * threadIdx + cellWidth / 2 - PaneConstants.LEFT_SPACE / 2);
 
@@ -724,6 +731,10 @@ public class ContentPane {
 				int from = group.get(row)._1;
 				int threadIdx = path.get(from).getThreadIndex();
 				int threadIdIndex = threadId.indexOf(threadIdx);
+				if(path.get(from).getThreadInfo().getLastLockName() == "JVM")
+				{
+						jvmName = "JVM";
+				}
 				drawThreadLabel(row, swimCell, threadIdx,threadIdIndex); //This threadIdx of row
 
 				/**

@@ -99,6 +99,11 @@ public class Instruction extends se.kth.tracedata.Instruction {
 	public void setMethodInfo(MethodInfo mi)
 	{
 	}
+	@Override
+	public String getLastlockName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 	

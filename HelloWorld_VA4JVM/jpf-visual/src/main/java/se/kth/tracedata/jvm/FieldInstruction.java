@@ -3,13 +3,15 @@ package se.kth.tracedata.jvm;
 import se.kth.tracedata.MethodInfo;
 
 public class FieldInstruction extends se.kth.tracedata.FieldInstruction{
-	MethodInfo mi;
+	protected MethodInfo mi;
 	protected String fname;
 	  protected String className;
 	  protected String varId;
-	  public FieldInstruction(String fname,String fcname) {
+	  protected String sourceLocation;
+	  public FieldInstruction(String fname,String fcname, String sourceLocation) {
 		this.fname = fname;
 		this.className = fcname;
+		this.sourceLocation =sourceLocation;
 	}
 
 
@@ -29,8 +31,7 @@ public class FieldInstruction extends se.kth.tracedata.FieldInstruction{
 
 	@Override
 	public String getFileLocation() {
-		// TODO Auto-generated method stub
-		return null;
+		return sourceLocation;
 	}
 
 	@Override
@@ -85,6 +86,13 @@ public class FieldInstruction extends se.kth.tracedata.FieldInstruction{
 	public void setMethodInfo(MethodInfo miInfo) {
 		mi = miInfo;
 		
+	}
+
+
+	@Override
+	public String getLastlockName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

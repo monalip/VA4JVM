@@ -1,4 +1,4 @@
-package se.kth.helloworld;
+package se.kth.helloworld.aspect;
 
 import java.io.BufferedReader;
 import com.sun.jndi.toolkit.url.Uri;
@@ -43,6 +43,7 @@ public class RuntimeData {
 	static  private  RuntimeData instance = null;
 	String app="Visualization";
 	static String cname= null;
+	static String pkgName= null;
 	static String mname = null;
 	static String sig= null;
 	static int lastLockRef = 1;
@@ -77,11 +78,12 @@ public class RuntimeData {
 	static boolean threadChange = false;
 	static int firstcheck = 0;
 	//create the array list
-	static Set<Thread> threads = new HashSet<Thread>();
+	public Set<Thread> threads = new HashSet<Thread>();
 	static int totalTrans = 0;
 	static boolean isSync =false;
 	static boolean isSynchBlock =false;
 	static boolean isUnLock =false;
+	public long maxThreadId =0;
 	
 	static int eventAdded = 0;
 	// constructor is private to make this class cannot instantiate from outside
@@ -103,7 +105,7 @@ public class RuntimeData {
 	static synchronized void createInvokeInstruction()
 	{	
 			ci=new se.kth.tracedata.jvm.ClassInfo(cname);
-			mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,isSync);				
+			mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,false);				
 			getSourceString();
 
 			insn = new JVMInvokeInstruction(cname,mname,sourceString);
@@ -116,7 +118,7 @@ public class RuntimeData {
 	static synchronized void createVirtualInvocationIns()
 	{
 		ci=new se.kth.tracedata.jvm.ClassInfo(cname);
-		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,isSync);
+		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,false);
 		
 		getSourceString();
 
@@ -130,8 +132,9 @@ public class RuntimeData {
 	{
 		
 		ci=new se.kth.tracedata.jvm.ClassInfo(cname);
-		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,isSync);
-		//System.out.println("Method Name "+mname+" IsSynch"+isSync+"\n");	
+		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,true);
+		
+		//System.out.println("Class Name "+cname+" IsSynch"+isSync+"\n");	
 		//insn = new LockInstruction(lastLockRef);
 		insn = new JVMReturnInstruction();
 		insn.setMethodInfo(mi);	
@@ -142,10 +145,10 @@ public class RuntimeData {
 	}
 	static synchronized void createLockInstruction()
 	{
-		
+			lastlockName = fname;
 			ci=new se.kth.tracedata.jvm.ClassInfo(cname);
 			mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,false);
-			insn = new LockInstruction(lastLockRef);
+			insn = new LockInstruction(lastLockRef, fname);
 			insn.setMethodInfo(mi);
 			getSourceString();
 			addPreviousStep();
@@ -156,20 +159,17 @@ public class RuntimeData {
 	
 	static synchronized void createFieldInstruction()
 	{
-		
-			insn = new FieldInstruction(fname,cname);
+		getSourceString();
+		ci=new se.kth.tracedata.jvm.ClassInfo(cname);
+		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,false);
+			insn = new FieldInstruction(fname,cname,sourceLocation);
 			insn.setMethodInfo(mi);
-			getSourceString();
 			addPreviousStep();
-		
-		
-		
 	}
 	
 	static synchronized void addPreviousStep() {
-			
 		long currentThreadId = Thread.currentThread().getId();
-		 cg = updateChoiceGenerator(mname);
+		 cg = updateChoiceGenerator(mname,fname);
 		if(firstcheck == 0)
 		{
 			prevThread= currentThreadId;
@@ -178,8 +178,12 @@ public class RuntimeData {
 		
 		long id = threadId;
 				
-	 if ((tr == null) || (prevThread != threadId))
+	 if ((tr == null) || (prevThread != threadId) || ((cg.getId()=="START")||(cg.getId()=="JOIN")||(cg.getId()=="WAIT")||(cg.getId()=="LOCK")||(cg.getId()=="RELEASE")||(cg.getId()=="TERMINATE")))
 	 {
+		 if(mname == "start")
+		 {
+			 //System.out.println("start"+threadId+" \n");
+		 }
 		 
 		 if( tr != null)
 		   {
@@ -209,12 +213,13 @@ public class RuntimeData {
 		 
 	  }
 	  isSync =false;
-	  isFirst = false;
+	  //isFirst = false;
 	  eventAdded++;
 	
 	
 	}
 	 static synchronized void addPreviousTr(Transition tr) {
+		 isFirst = false;
 		   assert (tr != null);
 		   //System.out.println("Transition added"+tr.getOutput());
 		   
@@ -228,28 +233,32 @@ public class RuntimeData {
 	 {
 		//code to get the particular line source code
 		// get path of current directory System.out.println(new File(".").getAbsoluteFile());
-		   
+		 
+		 String location= null;
 		   try
 			{
-			   File file = new File("./src/main/java/se/kth/helloworld/App.java");
+			   pkgName = pkgName.replace('.','/');
+			   //location = "src/main/java/"+pkgName+".java";
+			   location = "./src/main/java/se/kth/helloworld/App.java";
+			   File file = new File(location);
 				String path = file.getAbsolutePath();
+				//System.out.println("Path"+path);
 				boolean isFileExist = file.exists();
 				//if we are executing script from eclipse the current directory is differenent and same thing for the Maven script
 				// Hence the path of the file is depends upon path from which we are running the script
-				if(isFileExist)
-				{
-					//For eclipse 
-					sourceString = (Files.readAllLines(Paths.get(path)).get(locationNo - 1)).trim();
-				}
-				else
+				if(!isFileExist)
 				{
 					 //For maven 
-					file =  new File("./helloworld/src/main/java/se/kth/helloworld/App.java");
+					//location = "helloworld/"+location;
+					location = "helloworld/src/main/java/se/kth/helloworld/App.java";
+					file =  new File(location);
 					path = file.getAbsolutePath();
 				}
 				sourceString = (Files.readAllLines(Paths.get(path)).get(locationNo - 1)).trim();
+				
 			}
 			catch (Exception e) {
+				
 				e.printStackTrace();
 			}
 			
@@ -257,20 +266,21 @@ public class RuntimeData {
 	 static synchronized ThreadInfo updateThreadInfo()
 	{
 		long currentThreadId = Thread.currentThread().getId();
-		lastlockName= cname;
+		//lastlockName= fname;
 		 threadId = eventThread.getId();
 		 threadName = eventThread.getName();
 		 tStateName = eventThread.getState().toString();
 		 threadName = threadName.substring(threadName.lastIndexOf('.') + 1);
-		 thread = new	se.kth.tracedata.jvm.ThreadInfo(threadId, tStateName, threadName,lastLockRef,lastlockName);
+		 thread = new	se.kth.tracedata.jvm.ThreadInfo(threadId, tStateName, threadName,lastLockRef,"JVM");
 		return (thread);
 	}
-	 static synchronized ChoiceGenerator<ThreadInfo> updateChoiceGenerator(String methodName)
+	 static synchronized ChoiceGenerator<ThreadInfo> updateChoiceGenerator(String methodName, String fname)
 	{
-		if(methodName.length() > 0)
+		if(methodName.length() > 0 || fname.length() > 0)
 		{
+			//System.out.println("Event Added: "+eventAdded+"\n");
 			//long threadId = Thread.currentThread().getId();
-			if(isFirst) {
+			if(isFirst && methodName != "start" ) {
 				cg = new ThreadChoiceFromSet("ROOT", false,threadId,eventAdded); 
 				
 			}
@@ -337,8 +347,7 @@ public void displayErrorTrace() {
 		addLastTransition();
 		//Sort the stack based on the transition threadId to get group of same transion inthe main pannel
 		//Collections.sort(stack, new SortStackPriority());
-		//Collections.sort(stack, new SortStack());
-		
+		///Collections.sort(stack, new SortStack());
 		se.kth.jpf_visual.ErrorTracePanel gui = new se.kth.jpf_visual.ErrorTracePanel();
 			Path p= new se.kth.tracedata.jvm.Path(app,stack);
 				gui.drowJVMErrTrace(p, true);	

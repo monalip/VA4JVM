@@ -35,4 +35,9 @@ public class ThreadInfo implements se.kth.tracedata.ThreadInfo{
 		return lastLockName;
 	}
 
+	@Override
+	public String getLastLockName() {
+		return lastLockName;
+	}
+
 }
