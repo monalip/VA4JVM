@@ -1,5 +1,7 @@
 package se.kth.tracedata.jpf;
 
+import se.kth.tracedata.ChoiceGenerator;
+import se.kth.tracedata.ThreadInfo;
 import se.kth.tracedata.jpf.Instruction;
 
 
@@ -23,6 +25,11 @@ public class Step implements se.kth.tracedata.Step{
 	public se.kth.tracedata.Instruction getInstruction() {
 		return new Instruction(jpfStep.getInstruction());
 		///return jpfStep.getInstruction();
+	}
+	@Override
+	public ChoiceGenerator<ThreadInfo> getCg()
+	{
+		return null;
 	}
 	
 

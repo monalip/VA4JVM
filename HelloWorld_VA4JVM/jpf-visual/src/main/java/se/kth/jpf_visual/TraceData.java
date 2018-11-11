@@ -91,7 +91,7 @@ public class TraceData {
 			String choiId =t.getChoiceGenerator().getId();
 			long threadtransitionId = t.getThreadInfo().getId();
 			
-			 //System.out.println("Choice Id  "+choiId+"ThreadId "+threadtransitionId+"\n");
+			
 				
 			int currThread = t.getThreadIndex();
 			
@@ -157,8 +157,12 @@ public class TraceData {
 				//if (cg instanceof ThreadChoiceFromSet) {
 				//if condition is checked with the isInstaceofThreadChoiceFromSet() method in choicegeneraotr for jpf error trace
 				//as the cg is of type jpf as we are using adapters
-			
+				 //System.out.println("Choice Id  "+cg.getId()+"ThreadId "+transition.getThreadInfo().getId()+"\n");
 				if (cg.isInstaceofThreadChoiceFromSet() || cg instanceof ThreadChoiceFromSet) {
+					if(transition.getThreadInfo().getLastLockName() == "JVM") {	
+						prevThreadIdx = transition.getThreadIndex();
+						
+					}
 					
 						ThreadInfo ti = transition.getThreadInfo();
 						processChoiceGenerator(cg, prevThreadIdx, pi, height, ti,"");	
@@ -174,6 +178,7 @@ public class TraceData {
 				TextLine txtSrc = null;
 				for (int si = 0; si < transition.getStepCount(); si++) {
 					Step s = transition.getStep(si);
+					//System.out.println("Choice Id"+s.getCg().getId()+" threadId "+transition.getThreadInfo().getId()+" Location "+s.getLineString()+"Location string "+s.getLocationString()+"\n");
 					String line = s.getLineString();
 					
 					if (line != null) {
@@ -211,15 +216,19 @@ public class TraceData {
 					}
 					
 					if(transition.getThreadInfo().getLastLockName() == "JVM") {	
-						if(cg.getId()=="START"||cg.getId()=="JOIN")
-						{
-							if(line.contains("start")||line.contains("join"))
+						
+							if(s.getCg().getId()=="START"||s.getCg().getId()=="JOIN")
 							{
 								
 							ThreadInfo ti = transition.getThreadInfo();
-							processChoiceGenerator(cg, prevThreadIdx, pi, height, ti,line);
+							processChoiceGenerator(s.getCg(), prevThreadIdx, pi, height, ti,line);
 							}
-						}
+							/*else if((cg.getId()=="Running")&&(s.getCg().getId()=="LOCK"||s.getCg().getId()=="RELEASE"||s.getCg().getId()=="WAIT"||s.getCg().getId()=="TERMINATE"))
+							{
+								ThreadInfo ti = transition.getThreadInfo();
+								processChoiceGenerator(s.getCg(), prevThreadIdx, pi, height, ti,line);
+							}*/
+						
 					}
 					
 					lastLine = line;

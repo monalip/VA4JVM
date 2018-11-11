@@ -1,4 +1,4 @@
-package se.kth.helloworld.aspect;
+package se.kth.helloworld;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,11 +83,20 @@ aspect HelloAspect {
 	//Sychronized method
 		//|| execution(public synchronized* *.*(..)
 	pointcut synchPoint(Object l): (execution(public synchronized* *.*(..)) ) && target(l) && instrumentationScope(); // or call()}*/
+	before(Object l): synchPoint(l) 
+    {
+		
+		synchronized (HelloAspect.class)  {
+			updateSynchMethodInfo(thisJoinPointStaticPart,l,"lock");
+		}
+			
+		
+    }
 	after(Object l): synchPoint(l) 
     {
 		
 		synchronized (HelloAspect.class)  {
-			updateSynchMethodInfo(thisJoinPointStaticPart,l);
+			updateSynchMethodInfo(thisJoinPointStaticPart,l,"unlock");
 		}
 			
 		
@@ -197,23 +206,55 @@ aspect HelloAspect {
 		pointcut constructionCall() : (execution(*.new(..)) || initialization(*.new(..)));
 		
 	pointcut traceThrowingExceptionCall() : execution(* *(..) throws Exception+) || execution(* *(..) throws Exception+);
-	pointcut javaPackageRealtedCall(): call(* java..*.*(..)) || call(* java.lang.Object.*(..));
-	pointcut threadRealatecall():( call(Thread+.new(..)) || call(* Thread+.wait()) || call(* Thread+.notify()) || call(* Thread+.notifyAll())) && (!call(* Thread+.start()) && !call(* Thread+.join()));	
-	//pointcut traceMethod(): (execution (* *.*(..)) || execution(*.new(..)) || initialization(*.new(..)) || call(* java..*.*(..)) || call(void java.io.PrintStream.println(..)) || call(public void java.lang.Thread.start()))   && !cflow(within(HelloAspect)) ;
-	pointcut traceMethod(): (execution (* *.*(..)) ||threadRealatecall()|| constructionCall()  || javaPackageRealtedCall() || traceThrowingExceptionCall())  && !threadRealatecall() &&!(execution(synchronized* *.*(..))) &&  instrumentationScope() ;
-	after(): traceMethod() 
+	pointcut javaPackageRealtedCall(): (call(* java..*.*(..)) || call(* java.lang.Object.*(..))) && (!call(* java.lang.Object.wait(..)) )&&  instrumentationScope();
+	after(): javaPackageRealtedCall() 
 	{
 		
 			synchronized (HelloAspect.class) 
 			{
-				updateMethodInfo(thisJoinPointStaticPart);
+				updateMethodInfo(thisJoinPointStaticPart,false);
 			}
 			
 			
 	}
+	pointcut waitCall() :  call(* java.lang.Object.wait(..));
+	before():waitCall()
+	{
+		synchronized (HelloAspect.class) 
+		{
+			updateMethodInfo(thisJoinPointStaticPart,false);
+		}
+	}
+	// termination poincut
+	
+	pointcut threadRealatecall():( call(Thread+.new(..)) ) && (!call(* Thread+.start()) && !call(* Thread+.join()));	
+	//pointcut traceMethod(): (execution (* *.*(..)) || execution(*.new(..)) || initialization(*.new(..)) || call(* java..*.*(..)) || call(void java.io.PrintStream.println(..)) || call(public void java.lang.Thread.start()))   && !cflow(within(HelloAspect)) ;
+	pointcut traceMethod(): (execution (* *.*(..)) ||threadRealatecall()|| constructionCall()  || traceThrowingExceptionCall()) && !javaPackageRealtedCall() && !threadRealatecall() &&!(execution(synchronized* *.*(..))) &&  instrumentationScope() ;
+	before(): traceMethod() 
+	{
+		
+			synchronized (HelloAspect.class) 
+			{
+				updateMethodInfo(thisJoinPointStaticPart,false);
+			}
+			
+			
+	}
+	after():traceMethod()
+	{
+		
+		if(thisJoinPointStaticPart.getSignature().getName() == "run" || thisJoinPointStaticPart.getSignature().getName() == "main")
+		{
+			synchronized (HelloAspect.class) 
+			{
+				updateMethodInfo(thisJoinPointStaticPart,true);
+			}
+			
+		}
+	}
 	
 	//Thread related operation
-	after (Thread childThread) : (call(* Thread+.start()) ||call(* Thread+.join())) && instrumentationScope() && target(childThread)
+	before (Thread childThread) : (call(* Thread+.start())) && instrumentationScope() && target(childThread)
 	{
 		
 		synchronized (HelloAspect.class) 
@@ -223,6 +264,15 @@ aspect HelloAspect {
 		}
 			
 		
+		
+	}
+	after (Thread childThread) : (call(* Thread+.join())) && instrumentationScope() && target(childThread)
+	{
+		synchronized (HelloAspect.class) 
+		{
+			//System.out.print("methods Name: "+thisJoinPointStaticPart.getSignature().getName()+"\n");
+			tracethreadstartjoin(thisJoinPointStaticPart,childThread);
+		}
 		
 	}
 
@@ -284,7 +334,7 @@ aspect HelloAspect {
 	   }
 	   //Get and uodate information
 	   //update Synchronized method info
-	   private static synchronized  void updateSynchMethodInfo(StaticPart thisJoinPointStaticPart,Object l) {
+	   private static synchronized  void updateSynchMethodInfo(StaticPart thisJoinPointStaticPart,Object l,String val) {
 			sign = getSign(thisJoinPointStaticPart);
 			locationName = sign.toString();
 			sourceString = getsourceString(locationName);
@@ -297,10 +347,17 @@ aspect HelloAspect {
 			threadaspectj = Thread.currentThread();	//System.out.println("Second: " +methodName);
 			thread = getThreadId(Thread.currentThread());
 			fieldName="";
-			updateSynmethod(true);
+			if(val=="lock") {
+				updateSynmethod(true);
+			}
+			else if(val =="unlock")
+			{
+				global.isUnlockSync=true;
+			}
+			
 			//global.isSync=true;
 			//System.out.println("AspectJ ClassName: " +className+"Method Name "+methodName+"\n");
-			//log.log(Level.INFO,"Trace method methodName "+ methodName+" pointcut:" + thisJoinPoint.getKind()+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
+			//log.log(Level.INFO,"Trace Synchronized method methodName "+ methodName+" pointcut:" + thisJoinPointStaticPart.getKind()+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
 			threadLocklist.put(l,thread);
 			updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj,packagename);
 			global.createJVMReturnInstr();
@@ -324,6 +381,7 @@ aspect HelloAspect {
 			thread = getThreadId(Thread.currentThread());
 			
 			fieldName=getFieldNamelock(l.toString(),className);
+			//log.log(Level.INFO,"Trace Synchronized lock block: "+thisJoinPointStaticPart.getKind()+" Field Name "+fieldName+" Source Location: "+thisJoinPointStaticPart.getSourceLocation()+" CalsName"+className+" Trace ThreadId "+ Thread.currentThread().getId()+" \n");
 			
 			//System.out.println("Second: " +fieldName+"ClassName"+methodName+"\n");
 			if(lineNo != 0 && fieldName.length()>0)
@@ -355,6 +413,7 @@ aspect HelloAspect {
 			threadaspectj = Thread.currentThread();	//System.out.println("Second: " +methodName);
 			thread = getThreadId(Thread.currentThread());
 			fieldName=getFieldNamelock(l.toString(),className);
+			//log.log(Level.INFO,"Trace  Unlock block: "+thisJoinPointStaticPart.getKind()+" Field Name "+fieldName+" Source Location: "+thisJoinPointStaticPart.getSourceLocation()+" CalsName"+className+" Trace ThreadId "+ Thread.currentThread().getId()+" \n");
 			
 			//System.out.println("Second: " +fieldName+"ClassName"+methodName+"\n");
 			if(lineNo != 0 && fieldName.length()>0)
@@ -398,7 +457,7 @@ aspect HelloAspect {
 			}
 			//System.out.println("AspectJ ClassName: " +className+"Method Name "+methodName+"\n");
 			//System.out.println("Field: " +fieldName);
-			//log.log(Level.INFO,"Trace Synchronized lock block: "+thisJoinPoint.getKind()+ "Field Name"+fieldName+" Source Location: "+sourceLocation+" CalsName"+className+" Trace ThreadId "+ Thread.currentThread().getId()+" \n");
+			//log.log(Level.INFO,"Trace ReentrantLock lock block: "+thisJoinPointStaticPart.getKind()+ "Field Name"+fieldName+" Source Location: "+thisJoinPointStaticPart.getSourceLocation()+" CalsName"+className+" Trace ThreadId "+ Thread.currentThread().getId()+" \n");
 			
 	
 			fieldName ="";
@@ -422,7 +481,7 @@ aspect HelloAspect {
 			{	
 				
 				
-					global.isSynchBlock=true;
+				global.isUnLock=true;
 				
 				threadLocklist.put(l,thread);
 				updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj,packagename);
@@ -430,7 +489,7 @@ aspect HelloAspect {
 
 			}
 			//System.out.println("AspectJ ClassName: " +className+"Method Name "+methodName+"\n");
-			//log.log(Level.INFO,"Trace Synchronized lock block: "+thisJoinPoint.getKind()+ "Field Name"+fieldName+" Source Location: "+sourceLocation+" CalsName"+className+" Trace ThreadId "+ Thread.currentThread().getId()+" \n");
+			//log.log(Level.INFO,"Trace ReentrantLock unlock block: "+thisJoinPointStaticPart.getKind()+ "Field Name"+fieldName+" Source Location: "+thisJoinPointStaticPart.getSourceLocation()+" CalsName"+className+" Trace ThreadId "+ Thread.currentThread().getId()+" \n");
 			
 	
 			fieldName ="";
@@ -459,7 +518,7 @@ aspect HelloAspect {
 				if(fieldName.length() > 0)
 				{
 					updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj,packagename);
-					//log.log(Level.INFO,"getObject fieldName "+ fieldName+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
+					//log.log(Level.INFO,"getObject fieldName "+ fieldName+"Souce locatiom "+thisJoinPointStaticPart.getSourceLocation()+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
 					global.createFieldInstruction();
 				}
 				}
@@ -469,7 +528,7 @@ aspect HelloAspect {
 			
 		}
 	   //update the method information and create the instruction of rightype
-	   private static synchronized void updateMethodInfo(StaticPart thisJoinPointStaticPart) {
+	   private static synchronized void updateMethodInfo(StaticPart thisJoinPointStaticPart, boolean val) {
 			if(thisJoinPointStaticPart.getSignature().getName().length() > 0 && (prevMethod != thisJoinPointStaticPart.getSignature().getName()))
 			{
 			//System.out.println("After method "+ i+" \n");
@@ -488,17 +547,18 @@ aspect HelloAspect {
 			
 			thread = getThreadId(Thread.currentThread());
 			fieldName="";
-			if(methodName=="start")
+			if(methodName=="run" || methodName =="main")
 			{
+				global.isTerminate = val;
 				 //System.out.print("Method Name "+methodName+"\n");
 			}
 			if(getmethodName(thisJoinPointStaticPart).length() > 0 && (methodName!="start")&&(methodName!="join"))
 			{
 
 
-				//log.log(Level.INFO,"Trace method methodName "+ methodName+" pointcut:" + thisJoinPointStaticPart.getKind()+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
+				//log.log(Level.INFO,"Trace method methodName "+ methodName+" pointcut:" + thisJoinPointStaticPart.getKind()+"Souce location"+thisJoinPointStaticPart.getSourceLocation()+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
 				updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj,packagename);
-				if(methodName=="wait")
+				if(methodName=="wait" ||methodName=="notify" || methodName=="notifyAll" )
 				{
 					
 					global.createVirtualInvocationIns();
@@ -535,7 +595,8 @@ aspect HelloAspect {
 			methodName = getmethodName(thisJoinPointStaticPart);
 			sourceLocation = getsourceLocation(thisJoinPointStaticPart);
 			lineNo = getlineNo(sourceLocation);
-			threadaspectj = childThread;
+			threadaspectj = Thread.currentThread();
+			global.childThreadId = childThread.getId();
 			//System.out.print("method Name:"+methodName+"Thread Id"+childThread.getId()+"\n");
 			
 			thread = getThreadId(childThread);
@@ -544,7 +605,7 @@ aspect HelloAspect {
 				
 			
 
-				//log.log(Level.INFO,"Trace method methodName "+ methodName+" pointcut:" + thisJoinPoint.getKind()+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
+				//log.log(Level.INFO,"Trace Thread method methodName "+ methodName+" pointcut:" + thisJoinPointStaticPart.getKind()+"Source location"+thisJoinPointStaticPart.getSourceLocation()+" Trace method ThreadId "+ Thread.currentThread().getId()+" \n");
 				updateGlobalVar(sign,className,methodName,thread,sourceLocation,lineNo,fieldName,threadaspectj,packagename);
 				global.createInvokeInstruction();
 			

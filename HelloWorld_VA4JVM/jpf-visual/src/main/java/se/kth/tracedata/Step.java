@@ -9,6 +9,7 @@ public interface Step {
 	public String getLineString () ;
 	 public String getLocationString();
 	 public Instruction getInstruction();
+	 public ChoiceGenerator<ThreadInfo> getCg();
 	 
 
 }

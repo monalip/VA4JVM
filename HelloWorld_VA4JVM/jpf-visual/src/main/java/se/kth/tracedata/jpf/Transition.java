@@ -5,6 +5,7 @@ import java.util.ArrayList;
 //import com.google.common.base.Function;
 //import com.google.common.collect.Iterators;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.lang.Iterable;
 
 
@@ -110,6 +111,10 @@ public class Transition implements se.kth.tracedata.Transition, Iterable<Step>{
 	public void setChoiceGenerator(se.kth.tracedata.ChoiceGenerator<ThreadInfo> cg) {
 		// TODO Auto-generated method stub
 		
+	}
+	@Override
+	public void addJVMStep(LinkedList<Step> steplist) {
+	
 	}
 	
 	

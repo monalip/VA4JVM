@@ -1,7 +1,9 @@
 package se.kth.tracedata.jvm;
 
 
+import se.kth.tracedata.ChoiceGenerator;
 import se.kth.tracedata.Instruction;
+import se.kth.tracedata.ThreadInfo;
 
 
 public class Step implements se.kth.tracedata.Step{
@@ -9,13 +11,15 @@ public class Step implements se.kth.tracedata.Step{
 	Step next;
 	String lineString;
 	String locationString;
+	private ChoiceGenerator<ThreadInfo> cg;
 	
-	 public Step(Instruction insn, String lineString, String locationString) {
+	 public Step(Instruction insn, String lineString, String locationString, ChoiceGenerator<ThreadInfo> cg) {
 		 if (insn == null)
 		      throw new IllegalArgumentException("insn == null");
 		 this.insn = insn;
 		 this.lineString = lineString;
 		 this.locationString = locationString;
+		 this.cg =cg;
 		 
 		  }
 	 public Step() {
@@ -43,6 +47,11 @@ public class Step implements se.kth.tracedata.Step{
 	@Override
 	public Instruction getInstruction() {
 		return insn;
+	}
+	@Override
+	public ChoiceGenerator<ThreadInfo> getCg()
+	{
+		return cg;
 	}
 	
 

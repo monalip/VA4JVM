@@ -1,6 +1,7 @@
 package se.kth.tracedata.jvm;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import se.kth.tracedata.ChoiceGenerator;
 import se.kth.tracedata.Step;
@@ -75,10 +76,28 @@ public class Transition implements se.kth.tracedata.Transition,Iterable<Step>{
 		
 	}
 	@Override
+	public void addJVMStep(LinkedList<Step> steplist) {
+		if(first == null)
+		{
+			first = steplist.getFirst(); //.element get the head of the list
+			last = (se.kth.tracedata.jvm.Step) steplist.getLast();
+		}
+		else
+		{
+			last.next = (se.kth.tracedata.jvm.Step) steplist.getFirst();
+			last = (se.kth.tracedata.jvm.Step) steplist.getFirst();
+			
+		}
+		nSteps++;
+		
+	}
+	@Override
 	public void setChoiceGenerator(ChoiceGenerator<ThreadInfo>cg) {
 		this.cg = cg;
 		
 	}
+
+	
 	
 	
 

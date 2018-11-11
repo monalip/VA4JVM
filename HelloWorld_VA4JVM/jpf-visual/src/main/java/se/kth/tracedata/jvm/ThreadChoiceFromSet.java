@@ -53,6 +53,11 @@ public class ThreadChoiceFromSet implements se.kth.tracedata.ThreadChoiceFromSet
 	{
 		return idPriority;
 	}
+	@Override
+	public long getThreadID()
+	{
+		return threadId;
+	}
 	
 
 	

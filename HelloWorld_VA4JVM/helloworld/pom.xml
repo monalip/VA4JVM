@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>se.kth</groupId>
-  <artifactId>helloworld</artifactId>
+  <artifactId>RWVSNDriver</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <!-- -<packaging>jar</packaging> not allowwed as to use the modules has to be a "pom" project -->
   <packaging>jar</packaging>
 
-  <name>helloworld</name>
+  <name>RWVSNDriver</name>
   <url>http://maven.apache.org</url>
   
 
@@ -213,9 +213,9 @@
 				</executions>
 				<configuration>
 				<includePluginDependencies>true</includePluginDependencies>
-					<mainClass>se.kth.helloworld.App</mainClass>
+					<mainClass>se.kth.helloworld.RWVSNDriver</mainClass>
 					<arguments>
-					<argument>5</argument>
+					<argument>-classpath</argument>
 					</arguments>
 				</configuration>
 			</plugin>
@@ -245,7 +245,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>se.kth.helloworld.App</mainClass>
+							<mainClass>se.kth.helloworld.RWVSNDriver</mainClass>
 						</manifest>
 					</archive>
 					
@@ -270,7 +270,7 @@
           <manifest>
             <addClasspath>true</addClasspath>
             <classpathPrefix>lib/</classpathPrefix>
-            <mainClass>se.kth.helloworld.App</mainClass>
+            <mainClass>se.kth.helloworld.RWVSNDriver</mainClass>
           </manifest>
         </archive>
       </configuration>

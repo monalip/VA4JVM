@@ -10,6 +10,7 @@ public interface ChoiceGenerator<T> {
 	 public ThreadInfo getChoice (int idx);
 	 public ThreadInfo[] getChoices();
 	 public int getIdPriority();
+	public long getThreadID();
 		  
 
 }
