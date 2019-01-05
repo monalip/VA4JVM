@@ -1,0 +1,26 @@
+chatsim=/Users/qiyitang/Documents/PhD/2017GSOC/chatserver-sol/src
+
+target=ChatSim
+
+listener=gov.nasa.jpf.listener.PreciseRaceDetector
+cg.threads.break_arrays=true
+
+chatsim.classpath=/Users/qiyitang/Documents/PhD/2017GSOC/chatserver-sol/src/env,/Users/qiyitang/Documents/PhD/2017GSOC/chatserver-sol/src
+chatsim.sourcepath=/Users/qiyitang/Documents/PhD/2017GSOC/chatserver-sol/src
+
+vm.reuse_tid=false
+classpath=/Users/qiyitang/Documents/PhD/2017GSOC/chatserver-sol/src
+
+# print trace when property is violated
+report.errorTracePrinter.property_violation=trace
+
+# register console errorTracePrinter as a publisher
+report.publisher+=, errorTracePrinter
+report.errorTracePrinter.class=se.kth.jpf_visual.ErrorTracePrinter
+
+#turn on the shell
+shell=.shell.basicshell.BasicShell
+
+#turn on the new panel
+shell.panels+= ,errorTrace
+shell.panels.errorTrace=se.kth.jpf_visual.ErrorTracePanel

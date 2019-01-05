@@ -35,6 +35,11 @@ import se.kth.tracedata.Path;
  */
 
 public class ContentPane {
+<<<<<<< HEAD
+=======
+	//for JVM as thread Id is not start from 0
+		static String jvmName=null;
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 	private double cellWidth = 0;
 	private mxGraph graph;
@@ -51,6 +56,10 @@ public class ContentPane {
 	private double htPerLine;
 	private double wtPerLine = 7;
 	private int numOfRows = -1;
+<<<<<<< HEAD
+=======
+	private List<Integer> threadId = null;
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 	private LocationInGraph location;
 
@@ -71,9 +80,16 @@ public class ContentPane {
 	 *            the map of <row, TextLineList>
 	 * @param locate
 	 *            the place to store the components of the table
+<<<<<<< HEAD
 	 */
 	public ContentPane(double width, int nThreads, Path p, List<Pair<Integer, Integer>> grp,
 			Map<Integer, TextLineList> lt, LocationInGraph locate) {
+=======
+	 * @param threadId 
+	 */
+	public ContentPane(double width, int nThreads, Path p, List<Pair<Integer, Integer>> grp,
+			Map<Integer, TextLineList> lt, LocationInGraph locate, List<Integer> threadId) {
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 		this.lineTable = lt;
 		this.numOfThreads = nThreads;
@@ -82,6 +98,10 @@ public class ContentPane {
 		this.cellWidth = width;
 		this.numOfRows = group.size();
 		this.location = locate;
+<<<<<<< HEAD
+=======
+		this.threadId = threadId;
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 		// create graph
 		graph = new mxGraph() {
@@ -178,6 +198,14 @@ public class ContentPane {
 			String st = model.getStyle(threadLabel);
 			Map<String, Object> tmpStyle = graph.getStylesheet().getStyles().get(st);
 			int threadIdx = Integer.parseInt(((mxCell) threadLabel).getId());
+<<<<<<< HEAD
+=======
+			if(jvmName == "JVM")
+			{
+				threadIdx = threadId.indexOf(threadIdx);
+				
+			}
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 			tmpStyle.put(mxConstants.STYLE_SPACING_LEFT,
 					cellWidth * threadIdx + cellWidth / 2 - PaneConstants.LEFT_SPACE / 2);
 
@@ -720,7 +748,16 @@ public class ContentPane {
 				 */
 				int from = group.get(row)._1;
 				int threadIdx = path.get(from).getThreadIndex();
+<<<<<<< HEAD
 				drawThreadLabel(row, swimCell, threadIdx);
+=======
+				int threadIdIndex = threadId.indexOf(threadIdx);
+				if(path.get(from).getThreadInfo().getLastLockName() == "JVM")
+				{
+						jvmName = "JVM";
+				}
+				drawThreadLabel(row, swimCell, threadIdx,threadIdIndex); //This threadIdx of row
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 				/**
 				 * draw the detail line one at a time
@@ -730,8 +767,13 @@ public class ContentPane {
 				/**
 				 * draw summary line one at a time; hide those lines
 				 */
+<<<<<<< HEAD
 				drawSummaryBlankCell(row, threadIdx, rightCell);
 				mxCell summaryBorder = (mxCell) drawSummaryBorder(row, threadIdx, rightCell);
+=======
+				drawSummaryBlankCell(row, threadIdx, rightCell,threadIdIndex);
+				mxCell summaryBorder = (mxCell) drawSummaryBorder(row, threadIdx, rightCell,threadIdIndex);
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 				drawSummaryContent(row, threadIdx, summaryBorder);
 
@@ -820,15 +862,31 @@ public class ContentPane {
 		return swimCell;
 	}
 
+<<<<<<< HEAD
 	private void drawThreadLabel(int row, Object swimCell, int threadIdx) {
+=======
+	private void drawThreadLabel(int row, Object swimCell, int threadIdx, int threadIdIndex) {
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		Map<String, Object> threadLabel = new HashMap<String, Object>(contentStyle);
 		threadLabel.put(mxConstants.STYLE_SPACING_LEFT,
 				cellWidth * threadIdx + cellWidth / 2 - PaneConstants.LEFT_SPACE / 2);
 		graph.getStylesheet().putCellStyle("thread" + row, threadLabel);
 
+<<<<<<< HEAD
 		mxCell threadRow = (mxCell) graph.insertVertex(swimCell, null, "" + threadIdx, 0, 0, numOfThreads * cellWidth,
 				htPerLine + 10, "thread" + row);
 		threadRow.setId("" + threadIdx);
+=======
+		
+		mxCell threadRow = (mxCell) graph.insertVertex(swimCell, null, "" + threadIdx, 0, 0, numOfThreads * cellWidth,
+				htPerLine + 10, "thread" + row);
+		/*
+		 *
+		threadRow.setId("" + threadIdx);
+		Replace the threadIdx with threadIdIndex to get the our threadIds properly in main panel
+		*/
+		threadRow.setId("" + threadIdIndex);
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		threadRow.setConnectable(false);
 		location.addThreadLabel(row, threadRow);
 	}
@@ -855,15 +913,28 @@ public class ContentPane {
 		}
 	}
 
+<<<<<<< HEAD
 	private void drawSummaryBlankCell(int row, int threadIdx, Object rightCell) {
 		mxCell summaryBlank = (mxCell) graph.insertVertex(rightCell, null, null, 0, 0, threadIdx * cellWidth, 5,
 				"content");
 		summaryBlank.setConnectable(false);
 		summaryBlank.setId("" + threadIdx);
+=======
+	private void drawSummaryBlankCell(int row, int threadIdx, Object rightCell, int threadIdIndex) {
+		//mxCell summaryBlank = (mxCell) graph.insertVertex(rightCell, null, null, 0, 0, threadIdx * cellWidth, 5,
+		//		"content");
+		//To get the proper shifting of the data based on the thread we have taken the index of the thread list 
+		//and we are shifting the data of that thread according to that
+		mxCell summaryBlank = (mxCell) graph.insertVertex(rightCell, null, null, 0, 0, threadIdIndex * cellWidth, 5,
+				"content");
+		summaryBlank.setConnectable(false);
+		summaryBlank.setId("" + threadIdIndex);
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		summaryBlank.setVisible(false);
 		location.addSummaryBlank(row, summaryBlank);
 	}
 
+<<<<<<< HEAD
 	private Object drawSummaryBorder(int row, int threadIdx, Object rightCell) {
 		Map<String, Object> summaryStyle = new HashMap<String, Object>(contentStyle);
 		graph.getStylesheet().putCellStyle("summary", summaryStyle);
@@ -872,6 +943,17 @@ public class ContentPane {
 				(numOfThreads - threadIdx) * cellWidth, 0, "summary");
 		summaryBorder.setConnectable(false);
 		summaryBorder.setId("" + threadIdx);
+=======
+	private Object drawSummaryBorder(int row, int threadIdx, Object rightCell, int threadIdIndex) {
+		Map<String, Object> summaryStyle = new HashMap<String, Object>(contentStyle);
+		graph.getStylesheet().putCellStyle("summary", summaryStyle);
+
+		//mxCell summaryBorder = (mxCell) graph.insertVertex(rightCell, null, null, 0, 0,
+		//		(numOfThreads - threadIdx) * cellWidth, 0, "summary");
+		mxCell summaryBorder = (mxCell) graph.insertVertex(rightCell, null, null, 0, 0,(numOfThreads - threadIdIndex) * cellWidth, 0, "summary");
+		summaryBorder.setConnectable(false);
+		summaryBorder.setId("" + threadIdIndex);
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		location.addSummaryBorderCell(row, summaryBorder);
 		return summaryBorder;
 	}

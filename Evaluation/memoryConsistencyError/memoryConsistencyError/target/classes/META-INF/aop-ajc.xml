@@ -1,0 +1,6 @@
+<aspectj>
+<aspects>
+<aspect name="se.kth.helloworld.aspect.HelloAspect"/>
+</aspects>
+</aspectj>
+

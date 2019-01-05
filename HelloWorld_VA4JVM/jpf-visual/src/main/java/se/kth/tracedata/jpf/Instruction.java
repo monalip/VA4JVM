@@ -1,9 +1,17 @@
 package se.kth.tracedata.jpf;
 
+<<<<<<< HEAD
 
 
 public class Instruction extends se.kth.tracedata.Instruction {
 	 gov.nasa.jpf.vm.Instruction jpfInstruction;
+=======
+import se.kth.tracedata.MethodInfo;
+
+public class Instruction extends se.kth.tracedata.Instruction {
+	 gov.nasa.jpf.vm.Instruction jpfInstruction;
+	 
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 	
 	public Instruction(gov.nasa.jpf.vm.Instruction jpfInstruction)
 	{
@@ -11,7 +19,11 @@ public class Instruction extends se.kth.tracedata.Instruction {
 	}
 	@Override
 	public MethodInfo getMethodInfo() {
+<<<<<<< HEAD
 		return new MethodInfo(jpfInstruction.getMethodInfo());
+=======
+		return new se.kth.tracedata.jpf.MethodInfo(jpfInstruction.getMethodInfo());
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 	}
 	@Override
 	public String getFileLocation() {
@@ -94,5 +106,19 @@ public class Instruction extends se.kth.tracedata.Instruction {
 	public String getVariableId() {
 		return ((gov.nasa.jpf.vm.bytecode.FieldInstruction)jpfInstruction).getVariableId();
 	}
+<<<<<<< HEAD
+=======
+	@Override
+	public void setMethodInfo(MethodInfo mi)
+	{
+	}
+	@Override
+	public String getLastlockName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 	
 }

@@ -23,8 +23,15 @@
 		<java.version>1.8</java.version>
     
   </properties>
+<<<<<<< HEAD
   
  <build></build>	
+=======
+    
+ <build>
+    
+</build>	
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		
 	
 	

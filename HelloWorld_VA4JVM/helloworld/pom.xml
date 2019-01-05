@@ -3,12 +3,20 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>se.kth</groupId>
+<<<<<<< HEAD
   <artifactId>helloworld</artifactId>
+=======
+  <artifactId>RWVSNDriver</artifactId>
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
   <version>0.0.1-SNAPSHOT</version>
   <!-- -<packaging>jar</packaging> not allowwed as to use the modules has to be a "pom" project -->
   <packaging>jar</packaging>
 
+<<<<<<< HEAD
   <name>helloworld</name>
+=======
+  <name>RWVSNDriver</name>
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
   <url>http://maven.apache.org</url>
   
 
@@ -165,6 +173,10 @@
 					<outxml>true</outxml>
 					<verbose>true</verbose>
 					<showWeaveInfo>true</showWeaveInfo>
+<<<<<<< HEAD
+=======
+					<Xjoinpoints>synchronization</Xjoinpoints>
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		
 					<aspectLibraries>
 				      <aspectLibrary>
@@ -212,7 +224,11 @@
 				</executions>
 				<configuration>
 				<includePluginDependencies>true</includePluginDependencies>
+<<<<<<< HEAD
 					<mainClass>se.kth.helloworld.App</mainClass>
+=======
+					<mainClass>se.kth.helloworld.RWVSNDriver</mainClass>
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 					<arguments>
 					<argument>-classpath</argument>
 					</arguments>
@@ -244,7 +260,11 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
+<<<<<<< HEAD
 							<mainClass>se.kth.helloworld.App</mainClass>
+=======
+							<mainClass>se.kth.helloworld.RWVSNDriver</mainClass>
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 						</manifest>
 					</archive>
 					
@@ -269,7 +289,11 @@
           <manifest>
             <addClasspath>true</addClasspath>
             <classpathPrefix>lib/</classpathPrefix>
+<<<<<<< HEAD
             <mainClass>se.kth.helloworld.App</mainClass>
+=======
+            <mainClass>se.kth.helloworld.RWVSNDriver</mainClass>
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
           </manifest>
         </archive>
       </configuration>

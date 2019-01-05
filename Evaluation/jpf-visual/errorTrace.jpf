@@ -1,0 +1,23 @@
+# we are using oldclassic as default example
+target=oldclassic
+
+native_classpath+=./bin/
+
+#search.class=.search.heuristic.BFSHeuristic
+
+# register console errorTracePrinter as a publisher
+report.publisher+=, errorTracePrinter
+report.errorTracePrinter.class=se.kth.jpf_visual.ErrorTracePrinter
+
+# print trace when property is violated
+report.errorTracePrinter.property_violation=trace
+
+#turn on the shell
+shell=.shell.basicshell.BasicShell
+
+#turn on the new panel
+shell.panels+= ,errorTrace
+shell.panels.errorTrace=se.kth.jpf_visual.gui.ErrorTracePanel
+
+
+

@@ -6,7 +6,11 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
+<<<<<<< HEAD
 			<name>org.eclipse.jdt.core.javabuilder</name>
+=======
+			<name>org.eclipse.ajdt.core.ajbuilder</name>
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -17,6 +21,10 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
+<<<<<<< HEAD
+=======
+		<nature>org.eclipse.ajdt.ui.ajnature</nature>
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 	</natures>

@@ -13,6 +13,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+<<<<<<< HEAD
+=======
+import java.util.HashSet;
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +62,10 @@ public class ErrorTableAndMapPane extends JPanel implements ComponentListener {
 	private JSplitPane splitPane;
 	private JSplitPane mapPane;
 	private JPanel buttonPanel;
+<<<<<<< HEAD
+=======
+	private List<Integer> threadId = null;
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 	double cellWidth = -1;
 
@@ -69,6 +77,10 @@ public class ErrorTableAndMapPane extends JPanel implements ComponentListener {
 	private List<Double> threadHeightList;
 
 	public ErrorTableAndMapPane() {
+<<<<<<< HEAD
+=======
+		threadId = new ArrayList<>();
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		graphComponent = new mxGraphComponent(new mxGraph());
 		graphComponent.getGraphHandler().setRemoveCellsFromParent(false);
@@ -113,18 +125,31 @@ public class ErrorTableAndMapPane extends JPanel implements ComponentListener {
 		threadNames = td.getThreadNames();
 		lineTable = td.getLineTable();
 		threadStateMap = td.getThreadStateMap();
+<<<<<<< HEAD
+=======
+		threadId = td.getThreadIds();
+		
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 		// the main table
 		cellWidth = (splitPane.getLeftComponent().getBounds().getWidth() - PaneConstants.RANGE_SIZE
 				- PaneConstants.SIGN_SIZE - PaneConstants.BAR_SIZE) / numOfThreads;
+<<<<<<< HEAD
 		content = new ContentPane(cellWidth, numOfThreads, path, group, lineTable, location);
+=======
+		content = new ContentPane(cellWidth, numOfThreads, path, group, lineTable, location,threadId);
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		content.resize(cellWidth);
 
 		double rightCellWidth = (splitPane.getWidth() - splitPane.getLeftComponent().getBounds().getWidth()
 				- PaneConstants.RANGE_SIZE - PaneConstants.ARROW_SIZE - PaneConstants.SIGN_SIZE
 				- PaneConstants.BAR_SIZE) / numOfThreads;
 		threadStateView = new ThreadStateView(rightCellWidth, numOfThreads, path, group, lineTable, threadStateMap,
+<<<<<<< HEAD
 				location);
+=======
+				location,threadId);
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		threadStateComponent.setGraph(threadStateView.getGraph()); // =
 																	// threadStateView.getComponent();
 		threadStateComponent.addComponentListener(new MapListener());
@@ -144,7 +169,11 @@ public class ErrorTableAndMapPane extends JPanel implements ComponentListener {
 
 		// set menu
 	
+<<<<<<< HEAD
 		menu = new MenuPane(cellWidth, threadNames);
+=======
+		menu = new MenuPane(cellWidth, threadNames,threadId);
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		mxGraph menuGraph = menu.getGraph();
 		menuGraphComponent.setGraph(menuGraph);
 		menuGraphComponent.getGraphHandler().setRemoveCellsFromParent(false);

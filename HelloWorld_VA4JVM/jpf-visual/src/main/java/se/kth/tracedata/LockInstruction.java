@@ -7,4 +7,9 @@ public abstract class LockInstruction extends Instruction
 	    */
 	  public abstract int getLastLockRef () ;
 
+<<<<<<< HEAD
+=======
+	
+
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 }

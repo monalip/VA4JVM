@@ -76,7 +76,11 @@ public class ErrorTracePanel extends JPanel{
 		private ClassMethodExplorer classMethodExplorer;
 		public JPanel tablePanel = new JPanel();
 		//Frame to display the panel
+<<<<<<< HEAD
 		JFrame frame = new JFrame("Visualization");
+=======
+		JFrame frame = new JFrame();
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 		public ErrorTracePanel()
 		{
@@ -103,7 +107,12 @@ public class ErrorTracePanel extends JPanel{
 			tablePanel.setBackground(Color.white);
 			tablePanel.add(splitPane);
 			//set the size of frame
+<<<<<<< HEAD
 			frame.setSize(900, 500);
+=======
+			frame.setSize(1000, 600);
+			//frame.pack();
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			//Display the frame at the center
 			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -202,7 +211,11 @@ public class ErrorTracePanel extends JPanel{
 		if (found && path != null) 
 		{
 			drowErrTrace(path,found);
+<<<<<<< HEAD
 			
+=======
+			frame.setTitle(path.getApplication());
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		    frame.getContentPane().add(tablePanel, BorderLayout.CENTER);
 		    //frame.pack();
 		    frame.setVisible(true);
@@ -247,7 +260,10 @@ public class ErrorTracePanel extends JPanel{
 
 		// add monitor enter/exit and synchronized method check boxes
 		for (String s : fieldNames) {
+<<<<<<< HEAD
 			System.out.println(s);
+=======
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 			JCheckBox cb = new JCheckBox("(un)lock: " + s);
 			cb.setSelected(false);
 			cb.addItemListener(checkBoxListener);

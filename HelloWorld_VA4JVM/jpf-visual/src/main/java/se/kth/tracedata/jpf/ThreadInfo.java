@@ -22,10 +22,25 @@ public class ThreadInfo implements se.kth.tracedata.ThreadInfo{
 	@Override
 	public String getNameOfLastLock(int lastLockRef) {
 		
+<<<<<<< HEAD
 		//ElementInfo elementInfo = new ElementInfo(jpfThreadinfo.getElementInfo(lastLockRef));
+=======
+		ElementInfo elementInfo = new ElementInfo(jpfThreadinfo.getElementInfo(lastLockRef));
+		if(elementInfo == null)
+		{
+			return "";
+		}
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		return jpfThreadinfo.getElementInfo(lastLockRef).toString().replace("$", ".").replaceAll("@.*","");
 		
 		
 	}
+<<<<<<< HEAD
+=======
+	@Override
+	public String getLastLockName() {
+		return "lastLok";
+	}
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 }

@@ -5,6 +5,10 @@ import java.util.ArrayList;
 //import com.google.common.base.Function;
 //import com.google.common.collect.Iterators;
 import java.util.Iterator;
+<<<<<<< HEAD
+=======
+import java.util.LinkedList;
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 import java.lang.Iterable;
 
 
@@ -101,6 +105,26 @@ public class Transition implements se.kth.tracedata.Transition, Iterable<Step>{
 	public String getOutput() {
 		return jpfTransition.getOutput();
 	}
+<<<<<<< HEAD
+=======
+	@Override
+	public void addStep(Step step) {
+		
+	}
+
+	@Override
+	public void setChoiceGenerator(se.kth.tracedata.ChoiceGenerator<ThreadInfo> cg) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void addJVMStep(LinkedList<Step> steplist) {
+	
+	}
+	
+	
+	
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 	
 	
 

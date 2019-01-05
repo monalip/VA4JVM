@@ -8,6 +8,7 @@ import se.kth.tracedata.Transition;
 
 public class Path implements se.kth.tracedata.Path{
 	String             application;
+<<<<<<< HEAD
 	 private LinkedList<Transition> stack;
 	
 	  public Path (String app) {
@@ -18,6 +19,20 @@ public class Path implements se.kth.tracedata.Path{
 	public Iterator<Transition> iterator() {
 		// TODO Auto-generated method stub
 		return null;
+=======
+	 LinkedList<Transition> stack=new LinkedList<Transition>();
+	
+	 public Path (String app,  LinkedList<Transition> stack) {
+		    this.application = app;
+		    this.stack= stack;
+		  } 
+	  public void add (Transition t) {
+		    stack.add(t);
+		  }
+	@Override
+	public Iterator<Transition> iterator() {
+		return stack.iterator();
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 	}
 	@Override
 	public se.kth.tracedata.Path clone() {
@@ -27,7 +42,11 @@ public class Path implements se.kth.tracedata.Path{
 	@Override
 	public String getApplication() {
 		// TODO Auto-generated method stub
+<<<<<<< HEAD
 		return null;
+=======
+		return application;
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 	}
 	@Override
 	public boolean isEmpty() {
@@ -37,7 +56,11 @@ public class Path implements se.kth.tracedata.Path{
 	@Override
 	public int size() {
 		// TODO Auto-generated method stub
+<<<<<<< HEAD
 		return 0;
+=======
+		return stack.size();
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 	}
 	@Override
 	public boolean hasOutput() {
@@ -61,8 +84,12 @@ public class Path implements se.kth.tracedata.Path{
 	}
 	@Override
 	public Transition get(int pos) {
+<<<<<<< HEAD
 		// TODO Auto-generated method stub
 		return null;
+=======
+		 return stack.get(pos);
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 	}
 
 }

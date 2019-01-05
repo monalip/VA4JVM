@@ -7,16 +7,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+<<<<<<< HEAD
 import se.kth.tracedata.Left;
 import se.kth.tracedata.Pair;
 import se.kth.tracedata.ChoiceGenerator;
 import se.kth.tracedata.ClassInfo;
+=======
+
+import se.kth.tracedata.Left;
+import se.kth.tracedata.LockInstruction;
+import se.kth.tracedata.Pair;
+import se.kth.tracedata.ChoiceGenerator;
+import se.kth.tracedata.ClassInfo;
+import se.kth.tracedata.FieldInstruction;
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 import se.kth.tracedata.Instruction;
 import se.kth.tracedata.MethodInfo;
 import se.kth.tracedata.Path;
 import se.kth.tracedata.Step;
+<<<<<<< HEAD
 import se.kth.tracedata.ThreadInfo;
 import se.kth.tracedata.Transition;
+=======
+import se.kth.tracedata.ThreadChoiceFromSet;
+import se.kth.tracedata.ThreadInfo;
+import se.kth.tracedata.Transition;
+import se.kth.tracedata.VirtualInvocation;
+import se.kth.tracedata.JVMInvokeInstruction;
+import se.kth.tracedata.JVMReturnInstruction;
+
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 
 //methods of ThreadChoiceFromSet is created inside the ChoiceGenerator along with condition checking method for cg instance of ThreadChoiceFromSet
@@ -26,9 +46,18 @@ public class TraceData {
 
 	private int numOfThreads = -1;
 	private List<String> threadNames = null;
+<<<<<<< HEAD
 
 	private Path path;
 	
+=======
+	
+	private String lastLockName= null;
+	private Path path;
+	
+	private List<Integer> threadId = null;
+	
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 	
 
 	private List<Pair<Integer, Integer>> group = new ArrayList<>();
@@ -51,6 +80,10 @@ public class TraceData {
 		group = new ArrayList<>();
 		threadNames = new ArrayList<>();
 		numOfThreads = -1;
+<<<<<<< HEAD
+=======
+		threadId = new ArrayList<>();
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		if (path.size() == 0) {
 			return; // nothing to publish
 		}
@@ -68,15 +101,37 @@ public class TraceData {
 		processSynchronizedMethods();
 	}
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 	private void firstPass() {
 		int currTran = 0;
 		int prevThread = -1;
 		int start = -1;
+<<<<<<< HEAD
 	
 		for(Transition t: path) {
 			int currThread = t.getThreadIndex();
 			if (threadNames.size() == currThread) {
 				threadNames.add(t.getThreadInfo().getName());
+=======
+		
+	
+		for(Transition t: path) {
+			String choiId =t.getChoiceGenerator().getId();
+			long threadtransitionId = t.getThreadInfo().getId();
+			
+			
+				
+			int currThread = t.getThreadIndex();
+			
+			//Logic to add the unique thread Name
+			//if ((threadNames.size() == currThread) || !(threadId.contains(currThread))) {
+			if ( !(threadId.contains(currThread)) && currThread > prevThread) {
+				threadNames.add(t.getThreadInfo().getName());
+				threadId.add(currThread);
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 			}
 			if (currTran == 0) {
 				start = 0;
@@ -94,12 +149,26 @@ public class TraceData {
 			currTran++;
 			numOfThreads = Math.max(numOfThreads, currThread);
 		}
+<<<<<<< HEAD
 		numOfThreads++;
 	}
 
 	private void secondPass() {
 		// second pass of the path
 		int prevThreadIdx = 0;
+=======
+		//numOfThreads++;
+		numOfThreads=threadId.size();
+		
+	}
+
+	private void secondPass() {
+		
+		
+		// second pass of the path
+		int prevThreadIdx = 0;
+		
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		for (int pi = 0; pi < group.size(); pi++) {
 			Pair<Integer, Integer> p = group.get(pi);
 			int from = p._1;
@@ -110,11 +179,23 @@ public class TraceData {
 			ArrayList<TextLine> lineList = new ArrayList<>();
 			TextLineList txtLinelist = new TextLineList(lineList);
 			lineTable.put(pi, txtLinelist);
+<<<<<<< HEAD
+=======
+			/*for (Integer i: lineTable.keySet()){
+
+	            int key =i;
+	            String value = example.get(name).toString();  
+	            System.out.println(key + " " + value);  
+
+
+	}*/
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 			boolean isFirst = true;
 			for (int i = from; i <= to; i++) {
 				Transition transition = path.get(i);
 				String lastLine = null;
+<<<<<<< HEAD
 
 				int nNoSrc = 0;
 				ChoiceGenerator<?> cg = transition.getChoiceGenerator();
@@ -125,6 +206,25 @@ public class TraceData {
 				if (cg.isInstaceofThreadChoiceFromSet()) {
 					ThreadInfo ti = transition.getThreadInfo();
 					processChoiceGenerator(cg, prevThreadIdx, pi, height, ti);
+=======
+				
+				int nNoSrc = 0;
+				ChoiceGenerator<?> cg = transition.getChoiceGenerator();
+				//if (cg instanceof ThreadChoiceFromSet) {
+				//if condition is checked with the isInstaceofThreadChoiceFromSet() method in choicegeneraotr for jpf error trace
+				//as the cg is of type jpf as we are using adapters
+				 //System.out.println("Choice Id  "+cg.getId()+"ThreadId "+transition.getThreadInfo().getId()+"\n");
+				if (cg.isInstaceofThreadChoiceFromSet() || cg instanceof ThreadChoiceFromSet) {
+					if(transition.getThreadInfo().getLastLockName() == "JVM") {	
+						prevThreadIdx = transition.getThreadIndex();
+						
+					}
+					
+						ThreadInfo ti = transition.getThreadInfo();
+						processChoiceGenerator(cg, prevThreadIdx, pi, height, ti,"");	
+						
+					
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 				}
 
 				tempStr.append(cg + "\n");
@@ -135,7 +235,13 @@ public class TraceData {
 				TextLine txtSrc = null;
 				for (int si = 0; si < transition.getStepCount(); si++) {
 					Step s = transition.getStep(si);
+<<<<<<< HEAD
 					String line = s.getLineString();
+=======
+					//System.out.println("Choice Id"+s.getCg().getId()+" threadId "+transition.getThreadInfo().getId()+" Location "+s.getLineString()+"Location string "+s.getLocationString()+"\n");
+					String line = s.getLineString();
+					
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 					if (line != null) {
 						String src = line.replaceAll("/\\*.*?\\*/", "").replaceAll("//.*$", "")
 								.replaceAll("/\\*.*$", "").replaceAll("^.*?\\*/", "").replaceAll("\\*.*$", "").trim();
@@ -144,6 +250,10 @@ public class TraceData {
 							if (nNoSrc > 0) {
 								String noSrc = " [" + nNoSrc + " insn w/o sources]";
 								tempStr.append(noSrc + "\n");
+<<<<<<< HEAD
+=======
+								
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 								txtSrc = new TextLine(noSrc, false, false, transition, pi, height);
 								lineList.add(txtSrc);
 								height++;
@@ -160,13 +270,38 @@ public class TraceData {
 								txtSrc.setFirst();
 							}
 							lineList.add(txtSrc);
+<<<<<<< HEAD
 
+=======
+							
+							
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 							height++;
 							nNoSrc = 0;
 						}
 					} else { // no source
 						nNoSrc++;
 					}
+<<<<<<< HEAD
+=======
+					
+					if(transition.getThreadInfo().getLastLockName() == "JVM") {	
+						
+							if(s.getCg().getId()=="START"||s.getCg().getId()=="JOIN")
+							{
+								
+							ThreadInfo ti = transition.getThreadInfo();
+							processChoiceGenerator(s.getCg(), prevThreadIdx, pi, height, ti,line);
+							}
+							/*else if((cg.getId()=="Running")&&(s.getCg().getId()=="LOCK"||s.getCg().getId()=="RELEASE"||s.getCg().getId()=="WAIT"||s.getCg().getId()=="TERMINATE"))
+							{
+								ThreadInfo ti = transition.getThreadInfo();
+								processChoiceGenerator(s.getCg(), prevThreadIdx, pi, height, ti,line);
+							}*/
+						
+					}
+					
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 					lastLine = line;
 
 					if (line != null && txtSrc != null) {
@@ -216,6 +351,7 @@ public class TraceData {
 
 		}
 
+<<<<<<< HEAD
 	}
 
 	
@@ -225,6 +361,30 @@ public class TraceData {
 			if (lineTable.get(pi).getTextLine(height - 1).isSrc()) {
 				threadStartSet.add(new Pair<>(pi, height - 1));
 			}
+=======
+
+	}
+
+	
+	private void processChoiceGenerator(ChoiceGenerator<?> cg, int prevThreadIdx, int pi, int height, ThreadInfo ti, String line) {
+		// thread start/join highlight
+	
+		
+		if ((cg.getId() == "START" || cg.getId() == "JOIN") && height>0 && ti.getLastLockName() != "JVM") {
+			if (lineTable.get(pi).getTextLine(height - 1).isSrc()) {
+				threadStartSet.add(new Pair<>(pi, height - 1));
+			}
+		
+			
+		}
+		if(ti.getLastLockName() == "JVM" && (cg.getId() == "START" || cg.getId() == "JOIN")&& height>0 &&(line.contains("start")||line.contains("join")))
+		{
+			if (lineTable.get(pi).getTextLine(height - 1).isSrc()) {
+				//System.out.println("Value: "+getTextLine(height - 1)+"\n");
+				threadStartSet.add(new Pair<>(pi, height - 1));
+			}
+			return;
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		}
 		Pair<Integer, Integer> tmp = new Pair<>(pi, height);
 
@@ -250,7 +410,22 @@ public class TraceData {
 			//we have created method getChoice() directly inside the choicegenerator so we can access it
 			// with choicegenerator object we donot need casting 
 			//int tid = ((ThreadChoiceFromSet) cg).getChoice(cg.getTotalNumberOfChoices() - 1).getId();
+<<<<<<< HEAD
 			int tid = cg.getChoice(cg.getTotalNumberOfChoices() - 1).getId();
+=======
+			int tid =0;
+			if(cg.getTotalNumberOfChoices() == 0)
+			{
+				tid = ((ThreadChoiceFromSet) cg).getThreadId();
+			}
+			else
+			{
+				//we have created method getChoice() directly inside the choicegenerator so we can access it
+				// with choicegenerator object we donot need casting  for jpf error trace
+			
+				tid =cg.getChoice(cg.getTotalNumberOfChoices() - 1).getId();
+			}
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 			Pair<Integer, String> threadState = new Pair<>(tid, "START");
 
 			ArrayList<Pair<Integer, String>> list = new ArrayList<>();
@@ -303,23 +478,55 @@ public class TraceData {
 	//check the insn instanceof VirtualInvocation using method isInstanceofVirtualInv()  
 	
 	private void loadWaitNotify(String line, Instruction insn, int pi, int height) {
+<<<<<<< HEAD
 		if (line != null && insn.isInstanceofVirtualInv()) {
 			String insnStr = insn.toString();
 			if (insnStr.contains("java.lang.Object.wait()") || insnStr.contains("java.lang.Object.notify()")
 					|| insnStr.contains("java.lang.Object.notifyAll()")) {
 				waitSet.add(new Pair<>(pi, height - 1));
 			}
+=======
+		if (line != null && (insn.isInstanceofVirtualInv() || insn instanceof VirtualInvocation )) {
+			
+			String insnStr = null;
+			if(insn.isInstanceofVirtualInv())
+			{
+				insnStr=insn.toString();
+			}
+			else if(insn instanceof VirtualInvocation )
+			{
+				//As the instruction don't contain the information of the wait,notify directly 
+				//hence we have access that information from the signature parameter of the methodInfo
+				insnStr =insn.getMethodInfo().getUniqueName();
+				
+			}
+			if (insnStr.contains("java.lang.Object.wait(") || insnStr.contains("java.lang.Object.notify(")
+					|| insnStr.contains("java.lang.Object.notifyAll(")) {
+				waitSet.add(new Pair<>(pi, height - 1));
+			}
+			
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		}
 	}
 /*
  *  created the methods of LockInstruction inside the Instruction adapter and checking the insn is the instaceof condition using 
+<<<<<<< HEAD
  *	 fuction isInstanceofLockIns. Hence methods are directly calling with the help of Instruction object.
+=======
+ *	 function isInstanceofLockIns. Hence methods are directly calling with the help of Instruction object.
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
  * 
  **/
 		
 	private void loadLockUnlock(String line, Instruction insn, MethodInfo mi, ThreadInfo ti, int pi, int height) {
 		
+<<<<<<< HEAD
 		if (line != null && insn.isInstanceofLockIns())
+=======
+		//if field is lock then i have to LockInstruction
+		
+		if (line != null && (insn.isInstanceofLockIns() || insn instanceof LockInstruction))
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 		{
 			/*
 			 * ElementInfo is used to get the name of the last lock that was used by a thread.
@@ -329,9 +536,32 @@ public class TraceData {
 			 * Returning fieldName 
 			 *
 			 */
+<<<<<<< HEAD
 			
 			
 			String fieldName = ti.getNameOfLastLock(insn.getLastLockRef());
+=======
+			int lastLock = 0;
+			String fieldName =null;
+			
+			if (insn.isInstanceofLockIns())
+			{
+				lastLock= insn.getLastLockRef();
+				fieldName = ti.getNameOfLastLock(lastLock);
+				
+			}
+			else if( insn instanceof LockInstruction)
+			{
+				lastLock = ((LockInstruction)insn).getLastLockRef();
+				fieldName = ti.getNameOfLastLock(lastLock);
+				if(fieldName=="JVM") {
+					
+					fieldName=((LockInstruction)insn).getLastlockName();
+				}
+			}
+			
+			
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 			Pair<Integer, Integer> pair = new Pair<>(pi, height - 1);
 
 			if (fieldNames.contains(fieldName)) {
@@ -344,11 +574,20 @@ public class TraceData {
 			}
 		}
 		
+<<<<<<< HEAD
 		
 		//checking insn instanceof JVMReturnInstruction inside method isInstanceofJVMReturnIns() inside instruction adapter
 		if (line != null && insn.isInstanceofJVMReturnIns()) {
 			String mName = mi.getFullName();
 			String cName = mi.getClassName();
+=======
+		//if the method is lock then I have to use JVMReturnIns synchronization method
+		//checking insn instanceof JVMReturnInstruction inside method isInstanceofJVMReturnIns() inside instruction adapter
+		if (line != null && (insn.isInstanceofJVMReturnIns() || insn instanceof JVMReturnInstruction)) {
+			String mName = mi.getFullName();
+			String cName = mi.getClassName();
+			//System.out.println("Class Name "+cName+"Method Naem"+mName+"\n");
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 			if (lockMethodName.contains(mName)) {
 				Pair<Integer, Integer> pair = new Pair<>(pi, height - 1);
 				if (fieldNames.contains(cName)) {
@@ -370,11 +609,28 @@ public class TraceData {
 		//if (line != null && txtSrc != null && txtSrc.isSrc() && insn.isInstanceofFieldIns()) {
 		
 		
+<<<<<<< HEAD
 		if(line != null && txtSrc != null && txtSrc.isSrc() && insn.isInstanceofFieldIns()) {
 			/*  as method directly created insde instruction adapter hence we can call it using insn object and the there no need of casting
 			* String name = ((FieldInstruction) insn).getVariableId();
 			* */
 			String name = insn.getVariableId();
+=======
+		if(line != null && txtSrc != null && txtSrc.isSrc() && (insn.isInstanceofFieldIns() || insn instanceof FieldInstruction)) {
+			/*  as method directly created insde instruction adapter hence we can call it using insn object and the there no need of casting
+			* String name = ((FieldInstruction) insn).getVariableId();
+			* */
+			String name = null;
+			if(insn.isInstanceofFieldIns())
+			{
+				name= insn.getVariableId();
+			}
+			else if (insn instanceof FieldInstruction)
+			{
+				name = ((FieldInstruction) insn).getVariableId();
+			}
+			
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 			int dotPos = name.lastIndexOf(".");
 			if (dotPos == 0 || dotPos == name.length() - 1) {
 			} else {
@@ -394,6 +650,7 @@ public class TraceData {
 	}
 	
 	private void loadMethods(String line, Instruction insn, TextLine txtSrc) {
+<<<<<<< HEAD
 	
 	//checkIJVMInvok is checking whether the ins is the instance of JVMInvokeInstruction internally inside instruction adapter		
 	boolean checkIJVMInvok = insn.isInstanceofJVMInvok();
@@ -405,6 +662,34 @@ public class TraceData {
 			*/ 
 			String methodName = insn.getInvokedMethodName().replaceAll("\\(.*$", "");
 			String clsName = insn.getInvokedMethodClassName();
+=======
+		
+	
+	//checkIJVMInvok is checking whether the ins is the instance of JVMInvokeInstruction internally inside instruction adapter		
+	boolean	checkIJVMInvok = insn.isInstanceofJVMInvok();
+
+		
+		if (line != null && txtSrc != null && txtSrc.isSrc() && (checkIJVMInvok || insn instanceof JVMInvokeInstruction )) {
+			/* instead of calling getInvokedMethodName() of JVMInvokeInstruction i have now changed it
+			* I have created methods getInvokedMethodName() and getInvokedMethodClassName() inside instruction interface 
+			*to remove the previous error of instanceof and casting.
+			*
+			*/ 
+			String methodName=null;
+			String clsName=null;
+			if(checkIJVMInvok) {
+				methodName = insn.getInvokedMethodName().replaceAll("\\(.*$", "");
+				clsName = insn.getInvokedMethodClassName();
+				
+			}
+			else if(insn instanceof JVMInvokeInstruction)
+			{
+				 methodName = ((JVMInvokeInstruction)insn).getInvokedMethodName().replaceAll("\\(.*$", "");
+				 clsName = ((JVMInvokeInstruction)insn).getInvokedMethodClassName();
+			}
+				
+			
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 			if (classMethodNameMap.containsKey(clsName)) {
 				classMethodNameMap.get(clsName).add(methodName);
 			} else {
@@ -452,11 +737,31 @@ public class TraceData {
 			 if it is a instace of that object then it will call the methods getInvokedMethodClassName() and getInvokedMethodName of instructions
 			 * 
 			 */
+<<<<<<< HEAD
 				if (insn.isInstanceofVirtualInv())
 				{
 				
 				String cName = insn.getInvokedMethodClassName();
 				String tmp = cName + "." + insn.getInvokedMethodName();
+=======
+			
+			String cName = null;
+					String tmp = null;
+				if (insn.isInstanceofVirtualInv() )
+				{
+					
+						cName = insn.getInvokedMethodClassName();
+						tmp = cName + "." + insn.getInvokedMethodName();
+					
+				}
+				else if(insn instanceof VirtualInvocation) // modified as the getInvokedMethodClassName and getInvokedMethodName function are in the VirtualInvocation
+				{
+					cName = ((VirtualInvocation)insn).getInvokedMethodClassName();
+					tmp = cName + "." + ((VirtualInvocation)insn).getInvokedMethodName();
+					
+				}
+				
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 				Pair<Integer, Integer> pair = new Pair<>(tl.getGroupNum(), tl.getLineNum());
 
 				if (lockMethodName.contains(tmp)) {
@@ -472,7 +777,11 @@ public class TraceData {
 				}
 			}
 		}
+<<<<<<< HEAD
 	}
+=======
+	
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 	public Set<Pair<Integer, Integer>> getClassField(String clsName, String fieldName) {
 		String target = clsName + "." + fieldName;
@@ -500,22 +809,49 @@ public class TraceData {
 			Step step = tl.getTransition().getStep(si);
 			Instruction insn = step.getInstruction();
 			String cName = insn.getMethodInfo().getClassInfo().getName();
+<<<<<<< HEAD
 			if (clsName.equals(cName) && srcSet.contains(insn.getFileLocation())) {
+=======
+			if (clsName.equals(cName) && srcSet.contains(insn.getFileLocation()))
+			{
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 				targetSet.add(new Pair<Integer, Integer>(tl.getGroupNum(), tl.getLineNum()));
 				break;
 			} 
 			//else if (insn instanceof FieldInstruction) {
 			//if condition is checked using method isInstanceofFieldIns()
+<<<<<<< HEAD
 			else if (insn.isInstanceofFieldIns()) {
+=======
+			else if (insn.isInstanceofFieldIns() || insn instanceof FieldInstruction) {
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 				/*
 				//method is called directly using insn object as method is now created inside instreuction adapter itsel instade of FieldInstruction class
 				//hence there is no need of seperate FieldInstruction class
 				 * 
 				 */
+<<<<<<< HEAD
 				if (insn.getVariableId().equals(target)) {
 					targetSet.add(new Pair<Integer, Integer>(tl.getGroupNum(), tl.getLineNum()));
 					srcSet.add(insn.getFileLocation());
 					break;
+=======
+				if (insn.isInstanceofFieldIns() )
+				{
+					if (insn.getVariableId().equals(target)) {
+						targetSet.add(new Pair<Integer, Integer>(tl.getGroupNum(), tl.getLineNum()));
+						srcSet.add(insn.getFileLocation());
+						break;
+					}
+				}
+				else if(insn instanceof FieldInstruction)
+				{
+					if (((FieldInstruction)insn).getVariableId().equals(target)) {
+						targetSet.add(new Pair<Integer, Integer>(tl.getGroupNum(), tl.getLineNum()));
+						srcSet.add(((FieldInstruction)insn).getFileLocation());
+						break;
+					}
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 				}
 			}
 		}
@@ -547,14 +883,21 @@ public class TraceData {
 		for (int si = tl.getStartStep(); si <= tl.getEndStep(); si++) {
 			Step step = tl.getTransition().getStep(si);
 			Instruction insn = step.getInstruction();
+<<<<<<< HEAD
 			boolean checkJVMInvok = insn.isInstanceofJVMInvok(); 
+=======
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 			String cName = insn.getMethodInfo().getClassInfo().getName();
 			if (cName.equals(srcMap.get(insn.getFileLocation()))) {
 				targetSet.add(new Pair<Integer, Integer>(tl.getGroupNum(), tl.getLineNum()));
 				break;
 			} 
 			//else if (insn instanceof JVMInvokeInstruction) {
+<<<<<<< HEAD
 			else if(checkJVMInvok) {
+=======
+			else if(insn.isInstanceofJVMInvok() || insn instanceof JVMInvokeInstruction) {
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 				//String mName = ((JVMInvokeInstruction) insn).getInvokedMethodName().replaceAll("\\(.*$", "");
 				String mName = insn.getInvokedMethodName().replaceAll("\\(.*$", "");
 
@@ -598,6 +941,13 @@ public class TraceData {
 	public Path getPath() {
 		return this.path;
 	}
+<<<<<<< HEAD
+=======
+	public List<Integer> getThreadIds()
+	{
+		return this.threadId;
+	}
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 
 	public List<Pair<Integer, Integer>> getGroup() {
 		return group;

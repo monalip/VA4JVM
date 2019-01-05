@@ -4,6 +4,7 @@ and visualize different run-time events.
 
 Initially I have created the simple program which have different methods with different parameters. I have created aspectJ 
 point-cut and played with point-cut declaration to understand the method call with different parameters, return type.
+<<<<<<< HEAD
 
 ## Script Information:
 runAspectJ.sh : Script to run the AspectJ file
@@ -34,3 +35,5 @@ The project is run using "run.sh" shell script.</br>
 
  
 
+=======
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d

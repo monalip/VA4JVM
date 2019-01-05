@@ -14,5 +14,11 @@ public abstract class Instruction {
 	public  abstract boolean isInstanceofVirtualInv();
 	public  abstract boolean isInstanceofFieldIns();
 	public 	abstract String getVariableId();
+<<<<<<< HEAD
 	
+=======
+	public 	abstract void setMethodInfo(MethodInfo mi);
+	public abstract String getLastlockName();
+
+>>>>>>> 04a2dc071776c7773dee008f404eb0b1dbecb95d
 }
