@@ -15,11 +15,6 @@ On the front-end side, the code is well structured, so refactoring of code in jp
 
 In order to generate, JPF compatible error trace for regular JVM, AspectJ instrumentation tool is used on the back-end side. AspectJ captured the run-time events information during program execution in JVM. The captured data is temporarily stored into the instance of the singleton pattern. Further, these global variables are used to process captured event data into the data structure that used by jpf-visual for visualization.
 
-## Script Information:
-runAspectJ.sh : Script to run the AspectJ file
-
-runAspectJweaving.sh : Script to run the AspectJ after weaving Thread class.
-
 ## Building tool using Maven:
 For the building project using maven :
 
@@ -32,7 +27,7 @@ Follow the instruction given in link :
 
 http://www.baeldung.com/install-maven-on-windows-linux-mac
 
-#####Building and running an application with maven script:<br />
+####Building and running an application with maven script:<br />
 The project is built using Maven build management tool provides plugins that interact with an application. The project structure and contents are declared in the pom.xml file. The dependency tag manages the dependencies of the project required for successful building the project. It included dependencies on the existing 
 'jpf-visual" project for the visualization, AspectJ, and Java swing graph visualization( jgraphx ). The pom.xml file added various Maven plugins which are as follows:
 • aspectj-maven-plugin weaves AspectJ aspects into the classes using the AspectJ compiler. Used the addition configuration by providing tag <Xjoinpoints>synchronization</Xjoinpoints> enable the synchronize lock unlock pointcut in AspectJ.<br />
