@@ -1,5 +1,7 @@
 package se.kth.helloworld;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * This is an implementation of the ProducerConsumer algorithm.
  *
@@ -7,11 +9,16 @@ package se.kth.helloworld;
  * @version $Revision: 1.2 $ - $Date: 2005/04/15 19:32:49 $
  */
 public class ProducerConsumer {
-	public static int PRODS = 2;
-	public static int CONS = 2;
+	public static int PRODS = 4;
+	public static int CONS = 5;
 	public static int COUNT = 4;
 	public static int total = 0;
+	/*public static long startMainTime = 0;
+    public static long endMainTime = 0;
+    public static long endTraceTime = 0;
+    public static long startVisTime = 0;*/
 	public static void main(String[] args) throws Exception {
+		//startMainTime = System.nanoTime();
 	    if (args != null && args.length == 3) {
 	  PRODS = Integer.parseInt(args[0]);
 	  CONS = Integer.parseInt(args[1]);
@@ -33,6 +40,10 @@ public class ProducerConsumer {
 
 	    if (total != COUNT*PRODS)
 	      throw new RuntimeException("bug found - total is "+total+" and should be "+COUNT*PRODS);
+	   /* endMainTime = System.nanoTime();
+	    long totaltime =endMainTime-startMainTime;
+	    System.out.println("Total program execution time:"+TimeUnit.NANOSECONDS.toMillis(totaltime)+"\n");*/
+
 	}
 	}
 

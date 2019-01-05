@@ -41,7 +41,7 @@ public class RuntimeData {
 	
 	
 	static  private  RuntimeData instance = null;
-	String app="Visualization";
+	String app="VA4JVM for Dining philosophers program";
 	static String cname= null;
 	static String pkgName= null;
 	static String mname = null;
@@ -54,13 +54,14 @@ public class RuntimeData {
 	static ClassInfo ci ;
 	static MethodInfo mi ;
 	static int prevThreadId = 0;
-	
+	static boolean isTerminate=false;
 	static ChoiceGenerator<ThreadInfo> cg=null;
 	static String cgState;
 	//ChoiceGenerator<ThreadInfo> cg1 = new ThreadChoiceFromSet("ROOT", false);
 	static Transition tr = null ;
 	static Instruction insn;
 	static Step step;
+	static LinkedList<Step> steplist=new LinkedList<Step>();
 	static long threadId;
 	static String tStateName= null;
 	static String threadName= null;
@@ -71,6 +72,7 @@ public class RuntimeData {
 	static ThreadInfo thread;
 	static long prevThread= Thread.currentThread().getId();
 	static Thread eventThread=null;
+	static long childThreadId;
 	//= new	se.kth.tracedata.jvm.ThreadInfo(0, "ROOT", "main",lastLockRef,lastlockName);
 
 	static int i =0;
@@ -83,8 +85,9 @@ public class RuntimeData {
 	static boolean isSync =false;
 	static boolean isSynchBlock =false;
 	static boolean isUnLock =false;
+	static boolean isUnlockSync =false;
 	public long maxThreadId =0;
-	public static Thread threadtoAdd=null;
+	static boolean isTranAdded = false;
 	
 	static int eventAdded = 0;
 	// constructor is private to make this class cannot instantiate from outside
@@ -134,9 +137,6 @@ public class RuntimeData {
 		
 		ci=new se.kth.tracedata.jvm.ClassInfo(cname);
 		mi= new se.kth.tracedata.jvm.MethodInfo(ci,mname,sig,true);
-		
-		//System.out.println("Class Name "+cname+" IsSynch"+isSync+"\n");	
-		//insn = new LockInstruction(lastLockRef);
 		insn = new JVMReturnInstruction();
 		insn.setMethodInfo(mi);	
 		getSourceString();
@@ -167,56 +167,79 @@ public class RuntimeData {
 			insn.setMethodInfo(mi);
 			addPreviousStep();
 	}
-	
 	static synchronized void addPreviousStep() {
-			
-		long currentThreadId = Thread.currentThread().getId();
-		 cg = updateChoiceGenerator(mname,fname);
-		if(firstcheck == 0)
-		{
-			prevThread= currentThreadId;
-			firstcheck++;
-		}
 		
-		long id = threadId;
+		//update the choicegenerator when the particular events is occurred
+			cg = updateChoiceGenerator(mname,fname);
+				//for the first time add previussId step as a currenthreadId
+				if(firstcheck == 0)
+				{
+					prevThread= Thread.currentThread().getId();
+					firstcheck++;
+					
+				}
+				/*
+				 * If transition is null or there is thread change the add previos transition to the transition list
+				 * and create a new transition in witch new step is added
+				 * 
+				 */
+				if (((tr == null) || (prevThread != eventThread.getId())))
+				 {
+					
+					// for other than first transition if there is thread change occur add previous transition to the stack
+					if( tr != null)
+					   {
+						 addPreviousTr(tr); 
+						 threadChange = true;  
+						 prevThread = eventThread.getId();
+						 
+						 
+					   }
+					//Crete threadInfo
+					 thread = updateThreadInfo();
+					 //create new transition
+					 tr = new se.kth.tracedata.jvm.Transition(cg,thread);
+					 totalTrans++;
+					
+				 }
+				else if((cg.getId()=="ROOT"||cg.getId()=="START"||cg.getId()=="JOIN"||cg.getId()=="WAIT"||cg.getId()=="LOCK"||cg.getId()=="RELEASE"||cg.getId() == "TERMINATE" ))
+				{
+					addPreviousTr(tr);
+					//Crete threadInfo
+					 thread = updateThreadInfo();
+					 //create new transition
+					 tr = new se.kth.tracedata.jvm.Transition(cg,thread);
+					 totalTrans++;
+					
+				}
 				
-	 if ((tr == null) || (prevThread != threadId))
-	 {
-		 
-		 if( tr != null)
-		   {
-			 addPreviousTr(tr); 
-			 threadChange = true;  
-			 prevThread = threadId;
-		   }
-		 
-		 thread = updateThreadInfo();
-		  //thread = new se.kth.tracedata.jvm.ThreadInfo(threadId, tStateName,threadName,lastLockRef,lastlockName);
-			
-		tr = new se.kth.tracedata.jvm.Transition(cg,thread);
-		totalTrans++;
-	 }
-	 //Setting the cg aaccoring to diiferent Id
-		 tr.setChoiceGenerator(cg);
-	  assert(insn != null);
-	  if(mname.length() >0 || fname.length() > 0)
-	  {
-			
-		   step = new se.kth.tracedata.jvm.Step(insn,sourceString,sourceLocation);
-		   //System.out.println("Method Name "+insn.getMethodInfo().getUniqueName()+" Cg: " +cg.getId()+"Thread ID: "+threadId+"Field Name "+fname+"Source String "+sourceString+"Location No:"+locationNo+"\n");
-			
-			 (tr).addStep(step);	
-			 //System.out.println("Choice Id  "+cg.getId()+"Method Name "+mname+"\n");
-			 i++;  
-		 
-	  }
-	  isSync =false;
-	  isFirst = false;
-	  eventAdded++;
+					updateStep();	
+				 //update the boolean variables
+				 isSync =false;
+				  isUnLock =false;
+				  isSynchBlock=false;
+				  isTerminate =false;
+				  isUnlockSync =false;
+				  //isFirst = false;
+				  eventAdded++;
+				 
+				 
+				 
+		
+	}
 	
-	
+	 static synchronized void updateStep() {
+		 assert(insn != null);
+		 //if instruction is not null create the new step
+		 step = new se.kth.tracedata.jvm.Step(insn,sourceString,sourceLocation,cg);
+		 //add the step to transition
+		 steplist.add(step);
+		 (tr).addJVMStep(steplist);	
+		 steplist = new LinkedList<Step>(); // reset the linked list
+		
 	}
 	 static synchronized void addPreviousTr(Transition tr) {
+		 isFirst = false;
 		   assert (tr != null);
 		   //System.out.println("Transition added"+tr.getOutput());
 		   
@@ -276,7 +299,7 @@ public class RuntimeData {
 		if(methodName.length() > 0 || fname.length() > 0)
 		{
 			//long threadId = Thread.currentThread().getId();
-			if(isFirst) {
+			if(isFirst && (methodName != "start")) {
 				cg = new ThreadChoiceFromSet("ROOT", false,threadId,eventAdded); 
 				
 			}
@@ -292,17 +315,18 @@ public class RuntimeData {
 				
 				cg = new ThreadChoiceFromSet("WAIT", false,threadId,eventAdded); 		
 			}
-			else if((methodName == "lock") || isSync || isSynchBlock) {
+			else if( isSync || isSynchBlock) {
 				
 				cg = new ThreadChoiceFromSet("LOCK", false,threadId,eventAdded); 	
 				isSynchBlock=false;
+				isSync =false;
 			}
-			else if(methodName == "unlock" || isUnLock) {
+			else if( isUnLock || isUnlockSync) {
 						
 						cg = new ThreadChoiceFromSet("RELEASE", false,threadId,eventAdded); 
 						isUnLock=false;
 					}
-			else if(methodName == "run" || methodName == "main") {
+			else if((methodName == "run" || methodName == "main") && isTerminate) {
 				
 				cg = new ThreadChoiceFromSet("TERMINATE", false,threadId,eventAdded); 		
 			}

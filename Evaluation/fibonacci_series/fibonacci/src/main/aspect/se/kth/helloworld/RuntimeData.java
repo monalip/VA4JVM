@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
 import java.util.Scanner;
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +42,10 @@ public class RuntimeData {
 	
 	
 	static  private  RuntimeData instance = null;
-	String app="Visualization";
+	static boolean isUnlockSync =false;
+	static boolean isTerminate=false;
+	static LinkedList<Step> steplist=new LinkedList<Step>();
+	String app="VA4JVM of Fibonacci series";
 	static String cname= null;
 	static String pkgName= null;
 	static String mname = null;
@@ -167,55 +171,80 @@ public class RuntimeData {
 			addPreviousStep();
 	}
 	
-	static synchronized void addPreviousStep() {
-			
-		long currentThreadId = Thread.currentThread().getId();
-		 cg = updateChoiceGenerator(mname,fname);
-		if(firstcheck == 0)
-		{
-			prevThread= currentThreadId;
-			firstcheck++;
-		}
+static synchronized void addPreviousStep() {
 		
-		long id = threadId;
+		//update the choicegenerator when the particular events is occurred
+			cg = updateChoiceGenerator(mname,fname);
+				//for the first time add previussId step as a currenthreadId
+				if(firstcheck == 0)
+				{
+					prevThread= Thread.currentThread().getId();
+					firstcheck++;
+					
+				}
+				/*
+				 * If transition is null or there is thread change the add previos transition to the transition list
+				 * and create a new transition in witch new step is added
+				 * 
+				 */
+				if (((tr == null) || (prevThread != eventThread.getId())))
+				 {
+					
+					// for other than first transition if there is thread change occur add previous transition to the stack
+					if( tr != null)
+					   {
+						 addPreviousTr(tr); 
+						 threadChange = true;  
+						 prevThread = eventThread.getId();
+						 
+						 
+					   }
+					//Crete threadInfo
+					 thread = updateThreadInfo();
+					 //create new transition
+					 tr = new se.kth.tracedata.jvm.Transition(cg,thread);
+					 totalTrans++;
+					
+				 }
+				else if((cg.getId()=="ROOT"||cg.getId()=="START"||cg.getId()=="JOIN"||cg.getId()=="WAIT"||cg.getId()=="LOCK"||cg.getId()=="RELEASE"||cg.getId() == "TERMINATE" ))
+				{
+					addPreviousTr(tr);
+					//Crete threadInfo
+					 thread = updateThreadInfo();
+					 //create new transition
+					 tr = new se.kth.tracedata.jvm.Transition(cg,thread);
+					 totalTrans++;
+					
+				}
 				
-	 if ((tr == null) || (prevThread != threadId))
-	 {
-		 
-		 if( tr != null)
-		   {
-			 addPreviousTr(tr); 
-			 threadChange = true;  
-			 prevThread = threadId;
-		   }
-		 
-		 thread = updateThreadInfo();
-		  //thread = new se.kth.tracedata.jvm.ThreadInfo(threadId, tStateName,threadName,lastLockRef,lastlockName);
-			
-		tr = new se.kth.tracedata.jvm.Transition(cg,thread);
-		totalTrans++;
-	 }
-	 //Setting the cg aaccoring to diiferent Id
-		 tr.setChoiceGenerator(cg);
-	  assert(insn != null);
-	  if(mname.length() >0 || fname.length() > 0)
-	  {
-			
-		   step = new se.kth.tracedata.jvm.Step(insn,sourceString,sourceLocation);
-		   //System.out.println("Method Name "+insn.getMethodInfo().getUniqueName()+" Cg: " +cg.getId()+"Thread ID: "+threadId+"Field Name "+fname+"Source String "+sourceString+"Location No:"+locationNo+"\n");
-			
-			 (tr).addStep(step);	
-			 //System.out.println("Choice Id  "+cg.getId()+"Method Name "+mname+"\n");
-			 i++;  
-		 
-	  }
-	  isSync =false;
-	  isFirst = false;
-	  eventAdded++;
-	
-	
+					updateStep();	
+				 //update the boolean variables
+				 isSync =false;
+				  isUnLock =false;
+				  isSynchBlock=false;
+				  isTerminate =false;
+				  isUnlockSync =false;
+				  //isFirst = false;
+				  eventAdded++;
+				 
+				 
+				 
+		
 	}
+	
+	 static synchronized void updateStep() {
+		 assert(insn != null);
+		 //if instruction is not null create the new step
+		 step = new se.kth.tracedata.jvm.Step(insn,sourceString,sourceLocation,cg);
+		 //add the step to transition
+		 steplist.add(step);
+		 (tr).addJVMStep(steplist);	
+		 steplist = new LinkedList<Step>(); // reset the linked list
+		
+	}
+	
 	 static synchronized void addPreviousTr(Transition tr) {
+		 isFirst = false;
 		   assert (tr != null);
 		   //System.out.println("Transition added"+tr.getOutput());
 		   
@@ -274,8 +303,9 @@ public class RuntimeData {
 	{
 		if(methodName.length() > 0 || fname.length() > 0)
 		{
+			//System.out.println("Event Added: "+eventAdded+"\n");
 			//long threadId = Thread.currentThread().getId();
-			if(isFirst) {
+			if(isFirst && methodName != "start" ) {
 				cg = new ThreadChoiceFromSet("ROOT", false,threadId,eventAdded); 
 				
 			}
@@ -342,10 +372,20 @@ public void displayErrorTrace() {
 		addLastTransition();
 		//Sort the stack based on the transition threadId to get group of same transion inthe main pannel
 		//Collections.sort(stack, new SortStackPriority());
-		//Collections.sort(stack, new SortStack());
+		///Collections.sort(stack, new SortStack());
 		se.kth.jpf_visual.ErrorTracePanel gui = new se.kth.jpf_visual.ErrorTracePanel();
 			Path p= new se.kth.tracedata.jvm.Path(app,stack);
+			/* Fibonacci.startVisTime = System.nanoTime();
+			    long totaltime=Fibonacci.startVisTime-Fibonacci.startMainTime;
+			    System.out.println("before visualization time:"+TimeUnit.NANOSECONDS.toMillis(totaltime)+"\n");*/
+			
+			   
 				gui.drowJVMErrTrace(p, true);	
+				 /*Fibonacci.endTraceTime = System.nanoTime();
+				    long totaltimeafter =Fibonacci.endTraceTime-Fibonacci.startMainTime;
+				    System.out.println("after visualization time:"+TimeUnit.NANOSECONDS.toMillis(totaltimeafter)+"\n");*/
+				
+				   
 		 }
 	
 

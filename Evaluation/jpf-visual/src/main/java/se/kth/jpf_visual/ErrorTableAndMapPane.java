@@ -129,7 +129,7 @@ public class ErrorTableAndMapPane extends JPanel implements ComponentListener {
 				- PaneConstants.RANGE_SIZE - PaneConstants.ARROW_SIZE - PaneConstants.SIGN_SIZE
 				- PaneConstants.BAR_SIZE) / numOfThreads;
 		threadStateView = new ThreadStateView(rightCellWidth, numOfThreads, path, group, lineTable, threadStateMap,
-				location);
+				location,threadId);
 		threadStateComponent.setGraph(threadStateView.getGraph()); // =
 																	// threadStateView.getComponent();
 		threadStateComponent.addComponentListener(new MapListener());

@@ -8,12 +8,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 
-
-
-public class App
-{
-public static int PRODS = 2;
-public static int CONS = 2;
+public class App 
+{public static int PRODS = 4;
+public static int CONS = 5;
 public static int COUNT = 4;
 public static int total = 0;
 public static void main(String[] args) throws Exception {

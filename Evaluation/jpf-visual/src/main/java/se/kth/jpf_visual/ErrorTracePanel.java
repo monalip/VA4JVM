@@ -76,7 +76,7 @@ public class ErrorTracePanel extends JPanel{
 		private ClassMethodExplorer classMethodExplorer;
 		public JPanel tablePanel = new JPanel();
 		//Frame to display the panel
-		JFrame frame = new JFrame("Visualization");
+		JFrame frame = new JFrame();
 
 		public ErrorTracePanel()
 		{
@@ -203,6 +203,7 @@ public class ErrorTracePanel extends JPanel{
 		if (found && path != null) 
 		{
 			drowErrTrace(path,found);
+			frame.setTitle(path.getApplication());
 		    frame.getContentPane().add(tablePanel, BorderLayout.CENTER);
 		    //frame.pack();
 		    frame.setVisible(true);

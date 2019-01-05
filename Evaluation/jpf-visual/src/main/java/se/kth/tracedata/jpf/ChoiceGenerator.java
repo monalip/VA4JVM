@@ -53,6 +53,11 @@ public class ChoiceGenerator<T> implements se.kth.tracedata.ChoiceGenerator<T> {
 	{
 		return 0;
 	}
+	@Override
+	public long getThreadID()
+	{
+		return 0;
+	}
 	
 
 

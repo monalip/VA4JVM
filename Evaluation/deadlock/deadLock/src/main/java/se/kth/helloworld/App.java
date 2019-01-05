@@ -36,6 +36,7 @@ public class App
 
 			for (int i=0; i<num; i++){
 				phils[i].start();
+				
 			}
 		
 	    }
@@ -47,10 +48,11 @@ public class App
 	class Philosopher extends Thread{
 		public static  Set<Thread> threadList = new HashSet<Thread>();
 		static Object globalLock = new Object();//in order to make the whole thing atomic we use the global lock
-		RuntimeData global= RuntimeData.getInstance();
+		static RuntimeData global= RuntimeData.getInstance();
 		boolean isdeadlock = false;
 		static long maxThreadId;
 		static int countval=0;
+		static int count =0;
 		
 		
 	    public ReentrantLock rightFork;
@@ -63,59 +65,60 @@ public class App
 	    
 
 	    public void run() {
-	    	try {
-	    		
+
 	    	
 	        while (true) {
 	        	synchronized (globalLock) 
 	        	{
-	        		 
-					 rightFork.lock();
-					System.out.println("Thread Id "+Thread.currentThread().getId() + " Got right fork  "+"\n" );
+	        		count= count + 1;
+	        		 rightFork.lock();
+						
 					
-					 while (leftFork.isLocked()) {
-						 detectDeadLock();
+	        	}
+	        	synchronized (globalLock) 
+	        	{
+	        		 while (leftFork.isLocked()) {
+	        			 
+	        			 if(count > 4)
+	        			 {
+	        				detectDeadLock();
+	        			 }
 						 
 		        			
 		        			 try {
-		        		
+		        				 
 		        				 globalLock.wait();
+		        				
+		        				 
 							} catch (InterruptedException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 		        		}
 					 
-	        	}
-	        	synchronized (globalLock) 
-	        	{
-	        		
 					leftFork.lock();
-					System.out.println("Thread Id "+Thread.currentThread().getId() + " Got left fork \n" );
-					System.out.println("Thread Id "+Thread.currentThread().getId() + " Got both forks for eating \n" );
-					 detectDeadLock();
+				if(count == 5)
+       			 {
+					detectDeadLock();
+       			 }
 					
 	        	}
 	        	synchronized (globalLock) 
 	        	{
-					leftFork.unlock();
-					System.out.println("Thread Id "+Thread.currentThread().getId() + " Unlock left fork \n" );
+	        		leftFork.unlock();
 					globalLock.notifyAll();
-				
+					
 				
 	        	}
 	        	synchronized (globalLock) 
 	        	{
-					rightFork.unlock();
-					System.out.println("Thread Id "+Thread.currentThread().getId() + " Unlock right fork \n" );
+	        		rightFork.unlock();
 					globalLock.notifyAll();
+					
 				}
-			
+	        	
 	        }
-	    }
-	    catch (Exception e) {
-    		// TODO: handle exception
-    	}
+	    
     	
 
  }
@@ -123,33 +126,27 @@ public class App
 
 		private void detectDeadLock() {
 			int blockedThreadCount=0;
-			System.out.println("Thread Id "+Thread.currentThread().getId() + " Left fork is locked \n" );
+			//System.out.println("Thread Id "+Thread.currentThread().getId() + " Left fork is locked \n" );
     			threadList=(global.getThread());
 		    	maxThreadId = global.maxThreadId;
 					
-					//System.out.println("Thread List  \n");
-					
 					for(Thread t:global.getThread())
 					   {
-							System.out.println("Thread Id "+t.getId()+"State "+t.getState()+"\n");
-						//condition to check the last thread is the only thread that is in the state RUNNABLE
+						//condition to check at least one other thread that is in the state RUNNABLE
 						//&&(Thread.currentThread().getId() ==maxThreadId)
 						if((Thread.currentThread().getState().toString()=="RUNNABLE")&&(t.getState().toString() =="RUNNABLE"))
 						 {
 							
 								countval++;
-						 
+								
 						 }
-						else if((Thread.currentThread().getState().toString()=="RUNNABLE")&&(t.getState().toString() =="BLOCKED"))
-						{
-							blockedThreadCount++;
-						}
+						
 					   }
 					if(countval >= 1)
 					 {
-						System.out.println("Blocked"+blockedThreadCount+"\n");
-						if(Thread.currentThread().getId() ==maxThreadId || Thread.currentThread().getId() ==maxThreadId-1 )
-						{
+						
+						//if(Thread.currentThread().getId() ==maxThreadId || Thread.currentThread().getId() ==maxThreadId-1 )
+						//{
 							 System.out.println("Deadlock...");
 							 isdeadlock = true;
 							   //Start GUI
@@ -157,28 +154,10 @@ public class App
 							
 							
 							 // clear the threadList
-							  //global.threads.clear();
+							  global.threads.clear();
 							  countval=0;
-						}
-						/*else if(blockedThreadCount ==4)
-						{
-							System.out.println("Blocked Size..."+blockedThreadCount);
-							System.out.println("Deadlock...");
-							 isdeadlock = true;
-							   //Start GUI
-							 	global.displayErrorTrace();
-							
-							 	 //global.threads.clear();
-							 	blockedThreadCount=0;
-							 // clear the threadList
-							  //global.threads.clear();
-						}*/
-						
-						
-						 
-						
-						 // clear the threadList
-						  //global.threads.clear();
+						//}
+					
 						  //System.exit(0); //it is not working as the System.exit(0) immediately terminating visualization window also
 						   
 					 }

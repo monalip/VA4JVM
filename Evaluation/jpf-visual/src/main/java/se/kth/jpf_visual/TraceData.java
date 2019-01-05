@@ -88,6 +88,11 @@ public class TraceData {
 		
 	
 		for(Transition t: path) {
+			String choiId =t.getChoiceGenerator().getId();
+			long threadtransitionId = t.getThreadInfo().getId();
+			
+			
+				
 			int currThread = t.getThreadIndex();
 			
 			//Logic to add the unique thread Name
@@ -152,24 +157,15 @@ public class TraceData {
 				//if (cg instanceof ThreadChoiceFromSet) {
 				//if condition is checked with the isInstaceofThreadChoiceFromSet() method in choicegeneraotr for jpf error trace
 				//as the cg is of type jpf as we are using adapters
-			
+				 //System.out.println("Choice Id  "+cg.getId()+"ThreadId "+transition.getThreadInfo().getId()+"\n");
 				if (cg.isInstaceofThreadChoiceFromSet() || cg instanceof ThreadChoiceFromSet) {
+					if(transition.getThreadInfo().getLastLockName() == "JVM") {	
+						prevThreadIdx = transition.getThreadIndex();
+						
+					}
 					
 						ThreadInfo ti = transition.getThreadInfo();
-						if(ti.getLastLockName() == "JVM")
-						{
-							lastLockName="JVM";
-								if(cg.getId()!="START"||cg.getId()!="JOIN")
-								{
-									processChoiceGenerator(cg, prevThreadIdx, pi, height, ti);
-									
-								}
-						}
-						else
-						{
-							processChoiceGenerator(cg, prevThreadIdx, pi, height, ti);
-							
-						}
+						processChoiceGenerator(cg, prevThreadIdx, pi, height, ti,"");	
 						
 					
 				}
@@ -182,6 +178,7 @@ public class TraceData {
 				TextLine txtSrc = null;
 				for (int si = 0; si < transition.getStepCount(); si++) {
 					Step s = transition.getStep(si);
+					//System.out.println("Choice Id"+s.getCg().getId()+" threadId "+transition.getThreadInfo().getId()+" Location "+s.getLineString()+"Location string "+s.getLocationString()+"\n");
 					String line = s.getLineString();
 					
 					if (line != null) {
@@ -217,17 +214,23 @@ public class TraceData {
 					} else { // no source
 						nNoSrc++;
 					}
-					if(lastLockName == "JVM") {	
-						if(cg.getId()=="START"||cg.getId()=="JOIN")
-						{
-							if(line.contains("start")||line.contains("join"))
+					
+					if(transition.getThreadInfo().getLastLockName() == "JVM") {	
+						
+							if(s.getCg().getId()=="START"||s.getCg().getId()=="JOIN")
 							{
+								
 							ThreadInfo ti = transition.getThreadInfo();
-							processChoiceGenerator(cg, prevThreadIdx, pi, height, ti);
+							processChoiceGenerator(s.getCg(), prevThreadIdx, pi, height, ti,line);
 							}
-						}
-						//System.out.println("Line "+line+"si value"+si+"height "+height+"cg Id"+cg.getId()+"\n");
+							/*else if((cg.getId()=="Running")&&(s.getCg().getId()=="LOCK"||s.getCg().getId()=="RELEASE"||s.getCg().getId()=="WAIT"||s.getCg().getId()=="TERMINATE"))
+							{
+								ThreadInfo ti = transition.getThreadInfo();
+								processChoiceGenerator(s.getCg(), prevThreadIdx, pi, height, ti,line);
+							}*/
+						
 					}
+					
 					lastLine = line;
 
 					if (line != null && txtSrc != null) {
@@ -281,15 +284,24 @@ public class TraceData {
 	}
 
 	
-	private void processChoiceGenerator(ChoiceGenerator<?> cg, int prevThreadIdx, int pi, int height, ThreadInfo ti) {
+	private void processChoiceGenerator(ChoiceGenerator<?> cg, int prevThreadIdx, int pi, int height, ThreadInfo ti, String line) {
 		// thread start/join highlight
 	
 		
-		if ((cg.getId() == "START" || cg.getId() == "JOIN") && height>0) {
+		if ((cg.getId() == "START" || cg.getId() == "JOIN") && height>0 && ti.getLastLockName() != "JVM") {
 			if (lineTable.get(pi).getTextLine(height - 1).isSrc()) {
 				threadStartSet.add(new Pair<>(pi, height - 1));
 			}
+		
 			
+		}
+		if(ti.getLastLockName() == "JVM" && (cg.getId() == "START" || cg.getId() == "JOIN")&& height>0 &&(line.contains("start")||line.contains("join")))
+		{
+			if (lineTable.get(pi).getTextLine(height - 1).isSrc()) {
+				//System.out.println("Value: "+getTextLine(height - 1)+"\n");
+				threadStartSet.add(new Pair<>(pi, height - 1));
+			}
+			return;
 		}
 		Pair<Integer, Integer> tmp = new Pair<>(pi, height);
 

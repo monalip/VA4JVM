@@ -29,7 +29,7 @@ public class Path implements se.kth.tracedata.Path{
 	@Override
 	public String getApplication() {
 		// TODO Auto-generated method stub
-		return null;
+		return application;
 	}
 	@Override
 	public boolean isEmpty() {

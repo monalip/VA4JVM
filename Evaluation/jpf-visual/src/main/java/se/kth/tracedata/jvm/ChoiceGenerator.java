@@ -5,9 +5,14 @@ import se.kth.tracedata.ThreadInfo;
 public class ChoiceGenerator implements se.kth.tracedata.ChoiceGenerator<ThreadInfo>{
 	String id;
 	boolean isCascade;
-	 public ChoiceGenerator(String id,boolean isCascade) {
+	long threadId ;
+	int i;
+	 public ChoiceGenerator(String id,boolean isCascade, long l, int i) {
 		 this.id = id;
 		 this.isCascade = isCascade;
+		 this.threadId = l;
+		 this.i=i;
+		 
 		
 	}
 
@@ -43,6 +48,11 @@ public class ChoiceGenerator implements se.kth.tracedata.ChoiceGenerator<ThreadI
 	public int getIdPriority()
 	{
 		return 0;
+	}
+	@Override
+	public long getThreadID()
+	{
+		return threadId;
 	}
 
 }
