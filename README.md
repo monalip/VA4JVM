@@ -29,7 +29,7 @@ Follow the instruction given in link :
 http://www.baeldung.com/install-maven-on-windows-linux-mac
 
 #### Building and running an application with maven script:<br />
-Examples are inside the Evaluation folder [a link](https://github.com/monalip/VA4JVM/tree/master/Evaluation).
+Examples are inside the Evaluation folder [here](https://github.com/monalip/VA4JVM/tree/master/Evaluation).
 The project is built using Maven build management tool provides plugins that interact with an application. The project structure and contents are declared in the pom.xml file for each example. The dependency tag manages the dependencies of the project required for successful building the project. It included dependencies on the existing "jpf-visual" project for the visualization, AspectJ, and Java swing graph visualization( jgraphx ).<br/> 
 The pom.xml file added various Maven plugins which are as follows:
 • aspectj-maven-plugin weaves AspectJ aspects into the classes using the AspectJ compiler. Used the addition configuration by providing tag <Xjoinpoints>synchronization</Xjoinpoints> enable the synchronize lock unlock pointcut in AspectJ.<br />
