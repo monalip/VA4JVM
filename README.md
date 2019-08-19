@@ -5,7 +5,8 @@ Use of the multithreaded programs is increasing continuously nowadays which lead
 In this project, we focus on the integration of execution traces from the regular JVM into a “jpf-visual” tool 
 and visualize different run-time events.
 
-1. thread creation/death 2. lock/unlock
+1. thread creation/death 
+2. lock/unlock
 3. wait/notify
 4. field access
 5. method call
@@ -28,13 +29,14 @@ Follow the instruction given in link :
 http://www.baeldung.com/install-maven-on-windows-linux-mac
 
 #### Building and running an application with maven script:<br />
-The project is built using Maven build management tool provides plugins that interact with an application. The project structure and contents are declared in the pom.xml file. The dependency tag manages the dependencies of the project required for successful building the project. It included dependencies on the existing 
-'jpf-visual" project for the visualization, AspectJ, and Java swing graph visualization( jgraphx ). The pom.xml file added various Maven plugins which are as follows:
+Examples are inside the Evaluation folder [a link](https://github.com/monalip/VA4JVM/tree/master/Evaluation).
+The project is built using Maven build management tool provides plugins that interact with an application. The project structure and contents are declared in the pom.xml file for each example. The dependency tag manages the dependencies of the project required for successful building the project. It included dependencies on the existing "jpf-visual" project for the visualization, AspectJ, and Java swing graph visualization( jgraphx ).<br/> 
+The pom.xml file added various Maven plugins which are as follows:
 • aspectj-maven-plugin weaves AspectJ aspects into the classes using the AspectJ compiler. Used the addition configuration by providing tag <Xjoinpoints>synchronization</Xjoinpoints> enable the synchronize lock unlock pointcut in AspectJ.<br />
 
-• Apache Maven Compiler Plugin is used to compile the sources of the project. <configuration> tag helps to manage the configuration hence inside it <includes> and <excludes> tags help to exclude the JPF depen- dent classes of jpf-visual during compilation.<br />
+• Apache Maven Compiler Plugin is used to compile the sources of the project. <configuration> tag helps to manage the configuration hence inside it <includes> and <excludes> tags help to exclude the JPF dependent classes of jpf-visual during compilation.<br />
 
-• In order to add dependencies, from jar to maven project there were sev- eral approach was used. The local custom dependency can be added through the command line using the Maven goal install:install-file, but it is not a feasible solution in this case. As it needed to install the de- pendencies manually on each computer. Hence, maven-install-plugin is used to install the jar to the local Maven repository by specifying the location of the jar which wants to install. This approach helps to add the jgraphx dependency from its jar file during Maven clean phase.<br />
+• In order to add dependencies, from jar to maven project there were sev- eral approach was used. The local custom dependency can be added through the command line using the Maven goal install:install-file, but it is not a feasible solution in this case. As it needed to install the dependencies manually on each computer. Hence, maven-install-plugin is used to install the jar to the local Maven repository by specifying the location of the jar which wants to install. This approach helps to add the jgraphx dependency from its jar file during Maven clean phase.<br />
 
 • exec-maven-plugin execute the system with the help of exec: java which executes Java programs in the same VM. The configuration of this plugin provides an option to give the arguments to the specified program.
 After adding all required plugins and dependencies to the maven project created the pom.xml for the parent maven project. It added a module of jpf- visual and program whose analysis has to do in the parent pom.xml. The project is built and run using following commands in the directory where this parent pom.xml is located:<br />
