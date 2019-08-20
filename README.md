@@ -1,5 +1,5 @@
 # VA4JVM
-Use of the multithreaded programs is increasing continuously nowadays which leads to various concurrent issues. The analysis of such programs is com- plex due to the non-deterministic approach of the thread scheduler. Visualization of the concurrent events, based on thread helps to analyze the concurrent program efficiently. The extension such as visual analytics "jpf-visual" tool for regular JVM trace will help Java programmers to better understand and analyze the runtime execution of concurrent program. AspectJ instrumentation with its lock() and unlock() pointcut extension makes it possible to capture an important runtime event information in order to generate JVM event trace. A successful integration of the JVM trace into the "jpf-visual" is achieved through code refactoring and use of adapter classes in the existing tool. The implementation of such an approach for the regular JVM is preliminarily shown in this project work that it is possible to analyze the concurrent events using regular JVM. Such implementation can help to provide a generic approach for the concurrency issue analysis.
+Use of the multithreaded programs is increasing continuously nowadays which leads to various concurrent issues. The analysis of such programs is complex due to the non-deterministic approach of the thread scheduler. Visualization of the concurrent events, based on thread helps to analyze the concurrent program efficiently. The extension such as visual analytics "[jpf-visual](https://github.com/monalip/VA4JVM/tree/master/Evaluation/jpf-visual)" tool for regular JVM trace will help Java programmers to better understand and analyze the runtime execution of concurrent program. AspectJ instrumentation with its lock() and unlock() pointcut extension makes it possible to capture an important runtime event information in order to generate JVM event trace. A successful integration of the JVM trace into the "jpf-visual" is achieved through code refactoring and use of adapter classes in the existing tool. The implementation of such an approach for the regular JVM is preliminarily shown in this project work that it is possible to analyze the concurrent events using regular JVM. Such implementation can help to provide a generic approach for the concurrency issue analysis.
 
 
 In this project, we focus on the integration of execution traces from the regular JVM into a “jpf-visual” tool 
@@ -17,9 +17,7 @@ On the front-end side, the code is well structured, so refactoring of code in jp
 In order to generate, JPF compatible error trace for regular JVM, AspectJ instrumentation tool is used on the back-end side. AspectJ captured the run-time events information during program execution in JVM. The captured data is temporarily stored into the instance of the singleton pattern. Further, these global variables are used to process captured event data into the data structure that used by jpf-visual for visualization.
 
 ## Building tool using Maven:
-For the building project using maven :
-
-First we have to install the mavent into to the System.
+For the building project using maven first we have to install the mavent into to the System.
 
 ### Installing Maven on Ubuntu:
 sudo apt-get install maven
@@ -29,13 +27,14 @@ Follow the instruction given in link :
 http://www.baeldung.com/install-maven-on-windows-linux-mac
 
 ### Installing jpf-visual :
-All the detailed information about the "jpf-visual" project and the installation guide is provided in the folder [jpf-visual](https://github.com/monalip/VA4JVM/tree/master/Evaluation/jpf-visual). Furthermore, .zip files for jpf-shell and jpf-core are provided in the folder [JPF](https://github.com/monalip/VA4JVM/tree/master/JPF).
+All the detailed information about the "jpf-visual" project and its installation guide is provided in the folder [jpf-visual](https://github.com/monalip/VA4JVM/tree/master/Evaluation/jpf-visual). Furthermore, .zip files for jpf-shell and jpf-core are provided in the folder [JPF](https://github.com/monalip/VA4JVM/tree/master/JPF).
 
 #### Building and running an application with maven script:<br />
 
-The project is built using Maven build management tool provides plugins that interact with an application. The  [pom.xml](https://github.com/monalip/VA4JVM/blob/master/Evaluation/readerswriters/readerswriters/pom.xml) file in each example directory represents project structure and contents. The dependency tag manages the dependencies of the project required for successful building the project. It included dependencies on the existing "[jpf-visual](https://github.com/monalip/VA4JVM/tree/master/Evaluation/jpf-visual)" project for the visualization, AspectJ, and Java swing graph visualization(jgraphx).<br /> 
+The project is built using Maven build management tool which provides plugins that interact with an application. The  [pom.xml](https://github.com/monalip/VA4JVM/blob/master/Evaluation/readerswriters/readerswriters/pom.xml) file in each example directory represents project structure and contents. The dependency tag manages the dependencies of the project required for successful building the project. It included dependencies on the existing "[jpf-visual](https://github.com/monalip/VA4JVM/tree/master/Evaluation/jpf-visual)" project for the visualization, AspectJ, and Java swing graph visualization(jgraphx).<br /> 
 
-All the detail information of the required maven plugins and dependencies for child maven projects (existing "jpf-visual" project and selected concurrent program for analysis) are well documented in [Maven_Plugins_Info](https://github.com/monalip/VA4JVM/blob/master/Maven_Plugins_Info.md). Finally, the parent maven project is created in which the child module of jpf-visual and program whose analysis has to do is added in the parent [pom.xml](https://github.com/monalip/VA4JVM/tree/master/Evaluation/readerswriters/pom.xml).<br /> The project is built and run using following commands in the [directory](https://github.com/monalip/VA4JVM/tree/master/Evaluation/readerswriters) where this parent pom.xml is located:<br /> 
+All the detailed information of the required maven plugins and dependencies for child maven projects (existing "jpf-visual" project and selected concurrent program for analysis) are well documented in [Maven_Plugins_Info](https://github.com/monalip/VA4JVM/blob/master/Maven_Plugins_Info.md). Finally, the parent maven project is created in which the child module projects such as jpf-visual and program whose analysis has to do is added in the parent [pom.xml](https://github.com/monalip/VA4JVM/tree/master/Evaluation/readerswriters/pom.xml).<br /> 
+The project is built and run using following commands in the [directory](https://github.com/monalip/VA4JVM/tree/master/Evaluation/readerswriters) where this parent pom.xml is located:<br /> 
 • mvn clean: It helps to clean the project by removing artifact created by previous builds and add the jgraphx dependency from its jar to the maven repository.<br />
 
 • mvn install: install artifacts in the local repository.<br />
