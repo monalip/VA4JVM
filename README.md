@@ -28,19 +28,14 @@ Follow the instruction given in link :
 
 http://www.baeldung.com/install-maven-on-windows-linux-mac
 
+### Installing jpf-visual :
+All the detailed information about the "jpf-visual" project and the installation guide is provided [here] (https://github.com/monalip/VA4JVM/tree/master/Evaluation/jpf-visual). Furthermore, a .jar file for jpf-shell and jpf-core is provided in the folder JPF [here] ().
+
 #### Building and running an application with maven script:<br />
-Examples are inside the Evaluation folder [here](https://github.com/monalip/VA4JVM/tree/master/Evaluation).
-The project is built using Maven build management tool provides plugins that interact with an application. The  pom.xml file in each example directory represents project structure and contents. The dependency tag manages the dependencies of the project required for successful building the project. It included dependencies on the existing "jpf-visual" project [here](https://github.com/monalip/VA4JVM/tree/master/Evaluation/jpf-visual) for the visualization, AspectJ, and Java swing graph visualization( jgraphx ).<br/> 
-The pom.xml file added various Maven plugins which are as follows:<br />
-• aspectj-maven-plugin weaves AspectJ aspects into the classes using the AspectJ compiler. Used the addition configuration by providing tag <Xjoinpoints>synchronization</Xjoinpoints> enable the synchronize lock unlock pointcut in AspectJ.<br />
 
-• Apache Maven Compiler Plugin is used to compile the sources of the project. <configuration> tag helps to manage the configuration hence inside it <includes> and <excludes> tags help to exclude the JPF dependent classes of jpf-visual during compilation.<br />
+The project is built using Maven build management tool provides plugins that interact with an application. The  pom.xml file in each example directory represents project structure and contents. The dependency tag manages the dependencies of the project required for successful building the project. It included dependencies on the existing "jpf-visual" project [here](https://github.com/monalip/VA4JVM/tree/master/Evaluation/jpf-visual) for the visualization, AspectJ, and Java swing graph visualization( jgraphx ).<br /> 
 
-• In order to add dependencies, from jar to maven project there were several approach was used. The local custom dependency can be added through the command line using the Maven goal install:install-file, but it is not a feasible solution in this case. As it needed to install the dependencies manually on each computer. Hence, maven-install-plugin is used to install the jar to the local Maven repository by specifying the location of the jar which wants to install. This approach helps to add the jgraphx dependency from its jar file during Maven clean phase.<br />
-
-• exec-maven-plugin execute the system with the help of exec: java which executes Java programs in the same VM. The configuration of this plugin provides an option to give the arguments to the specified program.<br/>
-After adding all required plugins and dependencies to the maven project created the pom.xml for the parent maven project. It added a module of jpf-visual and program whose analysis has to do in the parent pom.xml. The project is built and run using following commands in the directory where this parent pom.xml is located:<br />
-
+All the detail information of the required maven plugins and dependencies for child maven projects ( existing "jpf-visual" project and selected concurrent program for analysis )  are well documented [here] (https://github.com/monalip/VA4JVM/blob/master/Maven_Plugins_Info.md). Finally, the parent maven project is created in which the child module of jpf-visual and program whose analysis has to do is added in the parent pom.xml. The project is built and run using following commands in the directory where this parent pom.xml is located [here] (https://github.com/monalip/VA4JVM/tree/master/Evaluation/readerswriters):<br /> 
 • mvn clean: It helps to clean the project by removing artifact created by previous builds and add the jgraphx dependency from its jar to the maven repository.<br />
 
 • mvn install: install artifacts in the local repository.<br />
@@ -48,7 +43,8 @@ After adding all required plugins and dependencies to the maven project created 
 • mvn exec:java: to execute the java program which internally starts the
 visualization.<br />
 
-The script are generated using these commands. This build scripts help to provides the necessary plugin and allow to compile only GUI related classes for the VA4JVM. The different concurrent programs source codes are present in the Evaluation folder.
+The script are generated using these commands. This build scripts help to provides the necessary plugin and allow to compile only GUI related classes for the VA4JVM.<br />
+##### The different concurrent programs source codes used for analysis are present in the Evaluation folder [here](https://github.com/monalip/VA4JVM/tree/master/Evaluation).
 
 #### Building the project :
 The project is build and run using "build.sh" and  "run.sh" shell script in the particular program directory [example](https://github.com/monalip/VA4JVM/tree/master/Evaluation/readerswriters).</br>
