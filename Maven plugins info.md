@@ -1,4 +1,4 @@
-#### Each pom.xml file of child Maven project added various Maven plugins which are as follows:<br />
+#### Pom.xml file of each child Maven project added various Maven plugins which are as follows:<br />
 • aspectj-maven-plugin weaves AspectJ aspects into the classes using the AspectJ compiler. Used the addition configuration by providing tag <Xjoinpoints>synchronization</Xjoinpoints> enable the synchronize lock unlock pointcut in AspectJ.<br />
 
 • Apache Maven Compiler Plugin is used to compile the sources of the project. <configuration> tag helps to manage the configuration hence inside it <includes> and <excludes> tags help to exclude the JPF dependent classes of jpf-visual during compilation.<br />
