@@ -3,10 +3,10 @@
 This project aims to provide a visualization tool for JPF (https://github.com/javapathfinder/jpf-core/). The jpf-core currently only supports Java 8. The current JPF can show the programme trace leading to a property violation, e.g. deadlock. 
 
 ## How to install jpf-core
-`git clone git@github.com:javapathfinder/jpf-core.git
+`git clone git@github.com:javapathfinder/jpf-core.git`<br />
 
-cd jpf-core
-./gradlew`<br />
+`cd jpf-core`<br />
+`./gradlew`<br />
 Refer [wiki](https://github.com/javapathfinder/jpf-core/wiki) of jpf-core more detailed instructions.
 The new panel, which is built upon jpf-shell (https://jpf.byu.edu/hg/jpf-shell), visualizes the programme trace to help understand the nature of failures and properties . 
 
