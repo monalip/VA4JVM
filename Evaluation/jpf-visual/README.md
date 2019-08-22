@@ -1,6 +1,14 @@
 # jpf-visual
 
-This project aims to provide a visualization tool for JPF (https://babelfish.arc.nasa.gov/hg/jpf/jpf-core). The current JPF can show the programme trace leading to a property violation, e.g. deadlock. The new panel, which is built upon jpf-shell (https://jpf.byu.edu/hg/jpf-shell), visualizes the programme trace to help understand the nature of failures and properties . 
+This project aims to provide a visualization tool for JPF (https://github.com/javapathfinder/jpf-core/). The jpf-core currently only supports Java 8. The current JPF can show the programme trace leading to a property violation, e.g. deadlock. 
+
+## How to install jpf-core
+`git clone git@github.com:javapathfinder/jpf-core.git
+
+cd jpf-core
+./gradlew`<br />
+Refer [wiki](https://github.com/javapathfinder/jpf-core/wiki) of jpf-core more detailed instructions.
+The new panel, which is built upon jpf-shell (https://jpf.byu.edu/hg/jpf-shell), visualizes the programme trace to help understand the nature of failures and properties . 
 
 ## How to Download
 You can obtain the source code of the jpf-visual using Mecurial (hg):
