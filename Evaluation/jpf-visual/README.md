@@ -67,4 +67,4 @@ shell.panels.errorTrace=ErrorTracePanel
 ~~~
 
 ##The current product and future work
-See [wiki page](https://bitbucket.org/qiyitang71/jpf-visual/wiki/Home).
+See [wiki page](https://github.com/qiyitang71/jpf-visual/wiki).
