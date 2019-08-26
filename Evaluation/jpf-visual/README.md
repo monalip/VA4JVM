@@ -9,7 +9,9 @@ This project aims to provide a visualization tool for [JPF](https://github.com/j
 
 `./gradlew`<br />
 Refer [wiki](https://github.com/javapathfinder/jpf-core/wiki) of jpf-core for more detailed instructions.
-The new panel, which is built upon [jpf-shell](https://jpf.byu.edu/hg/jpf-shell), visualizes the programme trace to help understand the nature of failures and properties . 
+The new panel, which is built upon [jpf-shell](https://jpf.byu.edu/hg/jpf-shell), visualizes the programme trace to help understand the nature of failures and properties.
+## How to install jpf-shell
+`hg clone https://jpf.byu.edu/hg/jpf-shell`
 
 ## How to Download
 You can obtain the source code of the jpf-visual using Git (git):
